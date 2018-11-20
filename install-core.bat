@@ -1,5 +1,7 @@
 @echo off
 setlocal enabaleDelayedExpansion
+::支持 UTF-8 字符集
+chcp 65001
 if "%1"=="" exit 
 ::存储当前脚本路径
 set myPath=%~dp0
