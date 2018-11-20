@@ -6,7 +6,7 @@ set install_state=0
 :start
 cls
 if "%install_state%"=="0" (
-	echo µÈ´ı usb Éè±¸¿ªÊ¼°²×°Èí¼ş
+	echo ç­‰å¾… usb è®¾å¤‡å¼€å§‹å®‰è£…è½¯ä»¶
 	set install_state=4
 )
 adb devices>devices_serial
@@ -39,10 +39,10 @@ echo serial_2:"!serial_2!"
 echo serial_3:"!serial_3!"
 echo serial_4:"!serial_4!"
 echo ---------------------------
-start .\install_2.0-core.bat !serial_1!
-start .\install_2.0-core.bat !serial_2!
-start .\install_2.0-core.bat !serial_3!
-start .\install_2.0-core.bat !serial_4!
-echo µ±ËùÓĞÉè±¸¸ü»»ºó°´ÈÎÒâ¼ü¿ªÊ¼ĞÂÒ»ÂÖÉı¼¶
+start .\install-core.bat !serial_1!
+start .\install-core.bat !serial_2!
+start .\install-core.bat !serial_3!
+start .\install-core.bat !serial_4!
+echo å½“æ‰€æœ‰è®¾å¤‡æ›´æ¢åæŒ‰ä»»æ„é”®å¼€å§‹æ–°ä¸€è½®å‡çº§
 pause
 goto start
