@@ -43,13 +43,16 @@ if not exist *.apk (
 	pause >nul
 	exit
 )
+set i_o_tra=0
 for %%t in (*.apk) do (
-	echo 正在安装 %%t
+	set /a i_o_tra= !i_o_tra! + 1
+	echo 正在安装第 !i_o_tra! 个应用： %%t
 	%myPath%\adb.exe -s %1 install -r %%t
 	if errorlevel 1 (
 		set errorStep=!nowStep!
 		goto failed
 	)
+	echo %%t 安装完成
 )
 echo 完成可选应用安装
 goto exit
