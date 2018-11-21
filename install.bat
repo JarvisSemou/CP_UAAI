@@ -10,6 +10,8 @@ setlocal enableDelayedExpansion
 chcp 65001
 ::强行关闭多余的 adb 
 taskkill /f /im adb.exe>nul>nul
+::重新开启 adb 服务
+adb start-server>nul>nul
 set install_state=0
 :start
 cls
@@ -17,7 +19,6 @@ if "%install_state%"=="0" (
 	echo 等待 usb 设备开始安装软件
 	set install_state=4
 )
-adb start-server>nul>nul
 adb devices>devices_serial
 set tra=1
 set serial_1=
