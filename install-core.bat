@@ -1,7 +1,7 @@
 @echo off
 setlocal enabaleDelayedExpansion
 ::支持 UTF-8 字符集
-chcp 65001
+chcp 65001>nul
 if "%1"=="" exit 
 ::存储当前脚本路径
 set myPath=%~dp0
@@ -18,7 +18,7 @@ echo 设备：%1
 if !isSuccess!==false (
 	cd %myPath%
 	color cf
-	adb wait-for-usb-device
+	adb -s %1 wait-for-usb-device
 	color 07
 	set isSuccess=true
 	goto !errorStep!
@@ -53,6 +53,9 @@ for %%t in (*.apk) do (
 		goto failed
 	)
 	echo %%t 安装完成
+	adb -s %1 shell input keyevent KEYCODE_WAKEUP
+	adb -s %1 shell input keyevent KEYCODE_DPAD_CENTER
+	adb -s %1 shell am start -n com.android.settings/com.android.settings.Settings
 )
 echo 完成可选应用安装
 goto exit
