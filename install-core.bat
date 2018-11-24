@@ -53,10 +53,10 @@ for %%t in (*.apk) do (
 		goto failed
 	)
 	echo %%t 安装完成
-	adb -s %1 shell input keyevent KEYCODE_WAKEUP
-	adb -s %1 shell input keyevent KEYCODE_DPAD_CENTER
-	adb -s %1 shell am start -n com.android.settings/com.android.settings.Settings
 )
+adb -s %1 shell input keyevent KEYCODE_WAKEUP
+adb -s %1 shell input keyevent KEYCODE_DPAD_CENTER
+adb -s %1 shell am start -n com.android.settings/com.android.settings.Settings
 echo 完成可选应用安装
 goto exit
 
