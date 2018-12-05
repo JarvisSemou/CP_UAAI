@@ -6,13 +6,13 @@
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @ECHO off
 setlocal enableDelayedExpansion
-::支持 UTF-8 字符集
+rem 支持 UTF-8 字符集
 chcp 65001>nul
-::强行关闭多余的 adb 
+rem 强行关闭多余的 adb 
 taskkill /f /im adb.exe>nul>nul
-::重新开启 adb 服务
+rem 重新开启 adb 服务
 adb start-server>nul>nul
-::当前正在处理的设备的序列号
+rem 当前正在处理的设备的序列号
 set "array_processing_serial="
 copy /y nul array_processing_serial>nul 1>nul
 
@@ -50,9 +50,3 @@ for /l %%a in ( ) do (
 	rem 等待一秒
 	ping -n 1 127.0.0.1>nul 1>nul
 )
-
-
-
-
-
-		
