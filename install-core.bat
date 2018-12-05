@@ -8,9 +8,9 @@ set myPath=%~dp0
 rem 保存代码段执行成功与否状态，true 为执行成功，false 为执行失败，默认为 true
 set isSuccess=true
 rem 保存当前代码段位置,应该在进入代码段之后马上设置
-set nowStep=
+set "nowStep="
 rem 保存最后一次执行出错的代码段的位置
-set errorStep=
+set "errorStep="
 :start
 set nowStep=start
 cls
@@ -18,7 +18,7 @@ echo 设备：%1
 if !isSuccess!==false (
 	cd %myPath%
 	color cf
-	adb -s %1 wait-for-usb-device
+	%myPath%\adb.exe -s %1 wait-for-usb-device
 	color 07
 	set isSuccess=true
 	goto !errorStep!
@@ -35,11 +35,11 @@ if not exist *.apk (
 	echo 注：不能使用中文名，且名字中不含空格，错误的文件名会使脚本出错
 	cd %myPath%
 	color 2f
-	echo 
-	echo 
-	echo 
-	echo 
-	echo 按任意键退出安装
+	@echo 
+	@echo 
+	@echo 
+	@echo 
+	@echo 按任意键退出安装
 	pause >nul
 	exit
 )
