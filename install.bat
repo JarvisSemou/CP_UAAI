@@ -14,7 +14,7 @@ rem 重新开启 adb 服务
 %~dp0adb.exe start-server>nul>nul
 rem 当前正在处理的设备的序列号
 set "array_processing_serial="
-set newline=^
+rem set newline=^
 
 
 
@@ -35,11 +35,12 @@ for /l %%a in ( ) do (
 		rem 标志设备是否为新加入的设备，true 标识设备是新加入的设备，false 为正在处理中的设备，默认为 true
 		set "isNew=true"
 		if "%%j"=="device" (
-			if defined array_temp_serial (
-				set "array_temp_serial=!array_temp_serial!!newline!%%i"
-			) else (
-				set "array_temp_serial=%%i"
-			)
+			rem if defined array_temp_serial (
+			rem	set "array_temp_serial=!array_temp_serial!!newline!%%i"
+			rem ) else (
+			rem	set "array_temp_serial=%%i"
+			rem )
+			set "array_temp_serial=!array_temp_serial!%%i "
 			if defined array_processing_serial (
 				for %%o in (!array_processing_serial!) do if "%%i"=="%%o" set "isNew=false"
 				if "!isNew!"=="true" start .\install-core.bat %%i
