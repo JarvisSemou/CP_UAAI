@@ -5,10 +5,10 @@ rem setlocal enableDelayedExpansion
 rem 支持 UTF-8 字符集
 chcp 65001 1>nul
 
-if "%2%"=="log" goto log
+if "%2"=="log" goto log
 goto eof
 
-rem save log to file witch name with
+rem save log to file witch name with date
 rem
 rem return void
 rem parm_3 bat file name,use to explanation whitch bat file print the log
