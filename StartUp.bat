@@ -33,7 +33,7 @@ rem	win 2000	5.0
 
 setlocal enableDelayedExpansion
 rem 支持 UTF-8 字符集
-chcp 65001>nul
+chcp 65001 1>nul
 
 rem 当前工作根路径
 set rootPath=%~dp0
@@ -65,8 +65,8 @@ ver | findstr "6\.1\.[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto newCore
 rem 检测是否是 win vista 系统
 ver | findstr "6\.0\.*[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto oldCore
 rem 检测是否是 win xp 系统
-ver | findstr "5\.[12]\.[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto oldCore'
-call %log
+ver | findstr "5\.[12]\.[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto oldCore
+call %_LogUtil% void log %0 "unknow system version,application not running"
 goto eof
 
 rem 新 ADB 工具
