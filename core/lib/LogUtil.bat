@@ -1,9 +1,6 @@
 @echo off
+if "%2"=="" setlocal enableDelayedExpansion
 rem Save log to the log file and name the log file with date
-
-rem setlocal enableDelayedExpansion
-rem 支持 UTF-8 字符集
-chcp 65001 1>nul
 
 if "%2"=="log" goto log
 goto eof

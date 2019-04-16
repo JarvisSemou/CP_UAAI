@@ -1,13 +1,11 @@
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::																	::
-::		  					CP_UAAI									::
-::																	::
-::											Author: Mouse.JiangWei	::
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @echo off
-setlocal enableDelayedExpansion
+rem use to detach the device and run an executor for authenticated device
+
+if "%2"=="" setlocal enableDelayedExpansion
 rem 支持 UTF-8 字符集
 chcp 65001>nul
+
+
 rem 强行关闭多余的 adb 
 taskkill /f /im adb.exe>nul>nul
 rem 重新开启 adb 服务
@@ -53,3 +51,5 @@ for /l %%a in ( ) do (
 	rem 等待一秒
 	ping -n 1 127.0.0.1>nul 1>nul
 )
+
+:eof
