@@ -1,0 +1,10 @@
+-pluginname
+-content  1
+-content  2
+-end
+
+#command
+-pluginname
+-content   1
+-content 2
+-end
