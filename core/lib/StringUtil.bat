@@ -1,7 +1,7 @@
 @echo off
 if "%~2"=="" setlocal enableDelayedExpansion
 @rem Provide string processing support
-if not defiend %~0 (
+if not defined %~0 (
 	call %ObjectUtil% string newObject %~n0 "%~f0" 
 	goto initStaticValue
 )
@@ -9,6 +9,7 @@ if not defiend %~0 (
 if "%~2"=="startWith" goto startWith
 if "%~2"=="endWith" goto endWith
 if "%~2"=="length" goto length
+if "%~2"=="isEqual" goto equal
 goto eof
 
 
@@ -48,6 +49,19 @@ set tmp_string_1=%tmp_string_1:~0,-1%
 set /a length=!length!+1
 if "!tmp_string_1!" neq "" goto length_l_1
 set %~1=!length!
+goto eof
+
+@rem Determine if two string equal
+@rem
+@rem return boolean Return true if there equal,otherwise return false
+@rem param_3 string String
+@rem param_4 string String
+:isEqual
+if "%~3"=="%~4" (
+	set %~1=true
+) else (
+	set %~1=false
+)
 goto eof
 
 :eof

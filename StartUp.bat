@@ -36,6 +36,7 @@ rem 				child variable:tmp_string_1,tmp_string_2,tmp_string_3,tmp_string_4
 rem
 rem			tmp_vo ---- temporary value object
 rem					child variable:tmp_vo_1,tmp_vo_2,tmp_vo_3,tmp_vo_4
+rem 		resutl ---- This is a special tmp value,you can use it when return value
 rem 
 rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 

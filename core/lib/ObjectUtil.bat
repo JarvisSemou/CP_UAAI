@@ -15,13 +15,34 @@ if "%~2"=="isObjectExist" goto isObjectExist
 if "%~2"=="newObject" goto newObject
 if "%~2"=="deleteValueObject" goto deleteValueObject
 if "%~2"=="deleteObject" goto deleteObject
+if "%~2"=="setValue" goto setValue
 goto eof
 
 @rem static value
 :initStaticValue
+@rem ===================================================================
 @rem This list format is: "","","",...,""
+@rem It is child element format is "path",for example:
+@rem 
+@rem globalObjectList="Object-1","Object-2","Object-3",...,"Object-n"
+@rem Object-1="c:\xxx\xxx.bat"
+@rem Object-2="c:\xxx\xxx-2.bat"
+@rem Object-3="..\xxx\xxx-3.bat"
+@rem ...
+@rem Object-n="..\xxx\xxx-n.bat"
+@rem ===================================================================
 set globalObjectList=null
+@rem ===================================================================
 @rem This list format is: "","","",...,""
+@rem It is child element format is "name:value",for example:
+@rem 
+@rem globalValueObjectList="Object-1_VO-1","Object-1_VO-2","Object-2_VO-1","Object-2_VO-2",...,"Object-n_VO-n"
+@rem Object-1_VO-1="name-1:value-2","name-2:value-2",...,"name-n:value-n"
+@rem Object-1_VO-2="name-1:value-2","name-2:value-2",...,"name-n:value-n"
+@rem Object-2_VO-1="name-1:value-2","name-2:value-2",...,"name-n:value-n"
+@rem ...
+@rem Object-n_VO-n="name-1:value-2","name-2:value-2",...,"name-n:value-n"
+@rem ===================================================================
 set globalValueObjectList=null
 goto methodBranch
 
@@ -43,19 +64,28 @@ if defined %~4 (
 )
 goto eof
 
-@rem Check the global value object exist or not
+@rem Check the global value object exist or not.
+@rem Note:This method will not check object.
 @rem
 @rem return boolean If value object exist that will return true,otherwise return false
-@rem param_3 Value object name that want to determine whether it exists
+@rem param_3 string Object name
+@rem param_4 string Value object name that want to determine whether it exists
 :isValueObjectExist
-call %LogUtil% void log %~n0 "Determine the value object '%~3' it exists"
+set result=false
+call %LogUtil% void log %~n0 "Determine the value object '%~3_%~4' it exists"
 if "!globalValueObjectList!"=="null" (
-	call %LogUtil% void log %~n0 "value object '%~3' was exist"
-	set %~1=true
+	call %LogUtil% void log %~n0 "value object '%~3_%~4' was not exist"
 ) else (
-	call %LogUtil% void log %~n0 "value object '%~3' does not exist"
-	set %~1=false
+	for %%i in (!globalValueObjectList!) do (
+		call %StringUtil% boolean isEqual %~3_%~4 %%~i
+		if "!boolean!"=="true" (
+			set result=true
+			goto isValueObjectExist_bl_1
+		)
+	)
 )
+:isValueObjectExist_bl_1
+set %~1=!result!
 goto eof
 
 @rem Create a new value object by name,if the object not exit or value object was exist,that will return null
@@ -64,6 +94,7 @@ goto eof
 @rem param_3 string Object name
 @rem param_4 string Value object name
 :newValueObject
+rem ===============================================
 if "!globalObjectList!"=="null" (
 	call %LogUtil% void log %~n0 "globalObjectList was null,object '%~3' does not exist, value object '%~4' will not create"
 	set %~1=null
@@ -170,6 +201,7 @@ for %%i in (!globalValueObjectList!) do (
 )
 set globalValueObjectList=!tmp_any_1!
 for %%i in (!%~3_%~4!) do (
+	@rem ===============================================
 	set !%~3_%~4_%%~i!=
 )
 set %~3_%~4=
@@ -186,7 +218,6 @@ if "!boolean!"=="false" (
 	set %~1=false
 	goto eof
 )
-rem 还需要认真思考删除逻辑
 for %%i in (!globalValueObjectList!) do (
 	call %StringUtil% boolean startWith %%~i %~3_
 	if "!boolean!"=="true" (
@@ -204,6 +235,26 @@ for %%i in (!globalObjectList!) do (
 	)
 )
 set globalObjectList=!tmp_any_1!
+goto eof
+
+@rem Set Value Object by given value name and value
+@rem 
+@rem return boolean If success that return true,otherwise return false
+@rem param_3 string Object name
+@rem param_4 string Value Object name
+@rem param_5 string Value name
+@rem param_6 string Value
+:setValueObject
+call %~n0  boolean isObjectExist %~3
+if "!boolean!"="false" (
+	call %LogUtil% void log %~n0 "Object '%~3' not exist,will not set value '%~5:%~6' for Value Object '%~4'"
+	set %~1=false
+	goto eof
+)
+call %~n0 boolean isValueObjectExist %~3
+if "!boolean!"=="false" (
+	call %LogUtil% void log %~n0 "Value Object "
+)
 goto eof
 
 :eof
