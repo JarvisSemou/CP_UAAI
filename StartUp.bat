@@ -64,6 +64,30 @@ if "%~2"=="coreEntry" goto coreEntry
 goto eof
 
 :main
+echo [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[@
+echo                                                                                      @
+echo                                                                                      @
+echo                                                                                      @
+echo                                                                                      @
+echo                                                                                      @
+echo         ]@@@@@`  @@@@@\]`           ,@@@     /@@.     =@@@`        .@@@\      @@@    @
+echo      ,@@@@@@@@@  @@@@@@@@@^^         =@@@     @@@.    ,@@@@@        /@@@@^^     @@@    @
+echo     =@@@.        @@@   =@@@         =@@@     @@@.   .@@@=@@^^      =@@^^@@@.    @@@    @
+echo     @@@^^         @@@  ,@@@/         =@@@     @@@.   /@@` @@@`    ,@@/ =@@\    @@@    @
+echo     @@@^^         @@@@@@@/`          ,@@@     @@@.  =@@\]]/@@@.  .@@@]]]/@@^^   @@@    @
+echo     =@@@`     .  @@@                 @@@^^   ,@@@  ,@@@@@@@@@@\  /@@@@@@@@@@`  @@@    @
+echo      ,@@@@@@@@@  @@@                 ,@@@@@@@@@.  @@@`     @@@^^=@@@     =@@@  @@@    @
+echo         .[[[[.   **,                    ,[[[`    ,**`      .`*`,*,.      ,*,. **,    @
+echo                                                                                      @
+echo                            \@@@@@@@^^                                                 @
+echo                                                                                      @
+echo                                                                                      @
+echo                                                                                      @
+echo                                                             Mouse.JiangWei           @
+echo                                                                                      @
+echo                                                                                      @
+echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+echo 脚本启动中。。。
 @rem 当前工作根路径
 set rootPath=%~dp0
 cd /d %rootPath%
@@ -138,9 +162,7 @@ set array_devices_serial=null
 			if "!array_processing_serial!" neq "null" (
 				for %%o in (!array_processing_serial!) do (
 					if "%%~i"=="%%~o" set isNew=false
-					goto main_b_1
 				)
-				:main_b_1
 				if "!isNew!"=="true" start /min %~n0 void coreEntry %%~i
 			) else (
 				start /min %~n0 void coreEntry %%~i
@@ -148,14 +170,12 @@ set array_devices_serial=null
 		)
 	)
 	set array_processing_serial=!array_temp_serial!
-	for %%i in (%listtmp%) do (
+	for %%i in (%listtmp%\*) do (
 		set tmp_boolean_1=false
 		for %%o in (!array_devices_serial!) do (
-			if "%%~i"=="%%~o" set tmp_boolean_1=true
-			goto :main_b_2
+			if "%%~ni"=="%%~o" set tmp_boolean_1=true
 		)
-		:main_b_2
-		if "!tmp_boolean_1!"=="false" del /f /q "%listtmp%\%%~i"
+		if "!tmp_boolean_1!"=="false" del /f /q "%listtmp%\%%~ni"
 	)
 	@rem 等待一秒
 	ping -n 1 127.0.0.1>nul 1>nul
