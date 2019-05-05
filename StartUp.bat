@@ -1,161 +1,273 @@
 @echo off
-if "%2"=="" setlocal enableDelayedExpansion
-rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-rem ::																	::
-rem ::		  					CP_UAAI									::
-rem ::																	::
-rem ::											Author: Mouse.JiangWei	::
-rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+@rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+@rem ::																	::
+@rem ::		  					CP_UAAI									::
+@rem ::																	::
+@rem ::											Author: Mouse.JiangWei	::
+@rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-rem 
-rem Some rules of development:
-rem 	1.Variable name using camel rule,the object start with underline
-rem 	2.Using double underline __ end of an array variable name,the 
-rem 	  array element sparate with blackspace
-rem 	3.StartUp script have to enable delayed expansion and other prohibition
-rem 	4.Universalize to use UNICODE character set
-rem		5.Universalize to explanation the script intent and meaning of parameter
-rem		  what scritp accepted at scritp top unless script have not parameter
-rem		6.Value object name start with vo_
-rem		7.The base data type is void,int,boolean,string,vo
-rem		8.Temporary value start with tmp_.Currently have 5 type:tmp_any,tmp_int,tmp_boolean,tmp_string,tmp_vo.
-rem			There are four child temporary variables for each type.
-rem
-rem			tmp_any ---- can save any value,maybe string,maybe int or boolean,value object
-rem					child variable:tmp_any_1,tmp_any_2,tmp_any_3,tmp_any_4
-rem
-rem			tmp_int ---- save int value what you want 
-rem					child variable:tmp_int_1,tmp_int_2,tmp_any_3,tmp_any_4
-rem
-rem			tmp_boolean ---- save boolean value
-rem					child variable:tmp_boolean_1,tmp_boolean_2,tmp_boolean_3,tmp_boolean_4
-rem
-rem			tmp_string ---- save string
-rem 				child variable:tmp_string_1,tmp_string_2,tmp_string_3,tmp_string_4
-rem
-rem			tmp_vo ---- temporary value object
-rem					child variable:tmp_vo_1,tmp_vo_2,tmp_vo_3,tmp_vo_4
-rem 		resutl ---- This is a special tmp value,you can use it when return value
-rem 
-rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+@rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+@rem 
+@rem Some rules of development:
+@rem 	1.Variable name using camel rule,the object start with underline
+@rem 	2.Using double underline __ end of an array variable name,the 
+@rem 	  array element sparate with blackspace
+@rem 	3.StartUp script have to enable delayed expansion and other prohibition
+@rem 	4.Universalize to use UNICODE character set
+@rem		5.Universalize to explanation the script intent and meaning of parameter
+@rem		  what scritp accepted at scritp top unless script have not parameter
+@rem		6.Value object name start with vo_
+@rem		7.The base data type is void,int,boolean,string,vo
+@rem		8.Temporary value start with tmp_.Currently have 5 type:tmp_any,tmp_int,tmp_boolean,tmp_string,tmp_vo.
+@rem			There are four child temporary variables for each type.
+@rem
+@rem			tmp_any ---- can save any value,maybe string,maybe int or boolean,value object
+@rem					child variable:tmp_any_1,tmp_any_2,tmp_any_3,tmp_any_4
+@rem
+@rem			tmp_int ---- save int value what you want 
+@rem					child variable:tmp_int_1,tmp_int_2,tmp_any_3,tmp_any_4
+@rem
+@rem			tmp_boolean ---- save boolean value
+@rem					child variable:tmp_boolean_1,tmp_boolean_2,tmp_boolean_3,tmp_boolean_4
+@rem
+@rem			tmp_string ---- save string
+@rem 				child variable:tmp_string_1,tmp_string_2,tmp_string_3,tmp_string_4
+@rem
+@rem			tmp_vo ---- temporary value object
+@rem					child variable:tmp_vo_1,tmp_vo_2,tmp_vo_3,tmp_vo_4
+@rem 		resutl ---- This is a special tmp value,you can use it when return value
+@rem 
+@rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
-rem Initalization of install scritp,it will call approptiate core according to 
-rem system environment.Currently it just distinguish  win 10,win 8,win 7,win vista,
-rem and win xp system.It will call 1.0.39 version adb tool for  win 10,win 8,win 7,
-rem ,and call 1.0.31 version adb tool for win vista and win xp system.
+@rem Initalization of install scritp,it will call approptiate core according to 
+@rem system environment.Currently it just distinguish  win 10,win 8,win 7,win vista,
+@rem and win xp system.It will call 1.0.39 version adb tool for  win 10,win 8,win 7,
+@rem ,and call 1.0.31 version adb tool for win vista and win xp system.
 
-rem win 10		10.0*
-rem	win 8		6.[23]*
-rem	win 7		6.1.*
-rem	win vista	6.0
-rem	win xp		5.[1-2]
-rem	win 2000	5.0
+@rem win 10		10.0*
+@rem	win 8		6.[23]*
+@rem	win 7		6.1.*
+@rem	win vista	6.0
+@rem	win xp		5.[1-2]
+@rem	win 2000	5.0
 
-rem æ”¯æŒ UTF-8 å­—ç¬¦é›†
-chcp 65001 1>nul
-
-if "%2"=="isPathLegitimate" goto isPathLegitimate
-
-rem å½“å‰å·¥ä½œæ ¹è·¯å¾„
-set rootPath=%~dp0
-rem bat åº“æ–‡ä»¶è·¯å¾„
-set libPath=%rootPath%core\lib\
-rem æ—¥å¿—ç›®å½•
-set logPath=%rootPath%core\log\
-rem impot core\lib\LogUtil.bat æ—¥å¿—å·¥å…·
-set _LogUtil=%libPath%LogUtil.bat
-rem import core\lib\SystemCommandUtil ç³»ç»Ÿå‘½ä»¤å·¥å…·
-set _SystemCommandUtil=%lib%SystemCommandUtil.bat
-rem import core\lib\ObjectUtil å¯¹è±¡æ“ä½œå·¥å·¥å…·
-set _ObjectUtil=%lib%ObjectUtil.bat
-rem import core\lib\StringUtil å­—ç¬¦ä¸²å·¥å…·
-set _StringUtil=%lib%StringUtil.bat
-rem å½“å‰æ ¸å¿ƒç›®å½•
-set corePath=""
-rem å½“å‰äºŒè¿›åˆ¶æ–‡ä»¶ç›®å½•
-set binPath=""
-rem å½“å‰æ’ä»¶ç›®å½•
-set pluginsPath=""
-rem æ ¸å¿ƒæ’ä»¶ç›®å½•
-set corePluginsPath=""
-rem ç”¨æˆ·æ–‡ä»¶å¤¹ï¼Œåˆ†åˆ«ä¸º appã€filesã€‚
-set vo_userDir__=app files
-rem å½“å‰ç³»ç»Ÿç‰ˆæœ¬
-rem set sysVer=""
-
-goto main
+if "%~2"=="" (
+	setlocal enableDelayedExpansion
+	goto main
+)
+if "%~2"=="isPathLegitimate" goto isPathLegitimate
+if "%~2"=="restartAdb" goto restartAdb
+if "%~2"=="setDeviceOptSatu" goto setDeviceOptSatu
+if "%~2"=="getDeviceOptSatu" goto getDeviceOptSatu
+if "%~2"=="getSatuMappedName" goto getSatuMappedName
+if "%~2"=="coreEntry" goto coreEntry
+goto eof
 
 :main
+@rem µ±Ç°¹¤×÷¸ùÂ·¾¶
+set rootPath=%~dp0
 cd /d %rootPath%
-rem æ£€æµ‹è·¯å¾„æ˜¯å¦åŒ…å«ç©ºæ ¼
+set path=%rootpath%bin;!path!
+set tmpdir=%temp%\tmpdir
+set listtmp=%tmpdir%\list
+@rem ¼ì²âÂ·¾¶ÊÇ·ñ°üº¬¿Õ¸ñ
 call %~n0 boolean isPathLegitimate
 if "!boolean!"=="false" (
-	echo å½“å‰è·¯å¾„ â€œ%~dp0â€ åŒ…å«ç©ºæ ¼ï¼Œè¯·å°†æ­¤è„šæœ¬åº”ç”¨æ”¾åˆ°æ— ç©ºæ ¼çš„è·¯å¾„ä¸­å†è¿è¡Œ
+	echo µ±Ç°Â·¾¶ ¡°%~dp0¡± °üº¬¿Õ¸ñ£¬Çë½«´Ë½Å±¾Ó¦ÓÃ·Åµ½ÎÞ¿Õ¸ñµÄÂ·¾¶ÖÐÔÙÔËÐÐ¡Œ
 	echo 1>nul
 	echo 1>nul
 	echo 1>nul
 	echo 1>nul
 	echo 1>nul
 	echo 1>nul
-	echo æŒ‰ä»»æ„é”®é€€å‡ºã€‚ã€‚ã€‚
+	echo °´ÈÎÒâ¼üÍË³ö
 	pause 1>nul
 	goto eof
 )
-rem æ£€æµ‹æ˜¯å¦æ˜¯ win 10 ç³»ç»Ÿ
-ver | findstr "10\.0\.[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto newCore
-rem æ£€æµ‹æ˜¯å¦æ˜¯ win 8 ç³»ç»Ÿ
-ver | findstr "6\.[23]\.*[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto newCore
-rem æ£€æµ‹æ˜¯å¦æ˜¯ win 7 ç³»ç»Ÿ
-ver | findstr "6\.1\.[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto newCore
-rem æ£€æµ‹æ˜¯å¦æ˜¯ win vista ç³»ç»Ÿ
-ver | findstr "6\.0\.*[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto oldCore
-rem æ£€æµ‹æ˜¯å¦æ˜¯ win xp ç³»ç»Ÿ
-ver | findstr "5\.[12]\.[0-9]*" 1>nul 2>nul & if %errorlevel% equ 0 goto oldCore
-call %_LogUtil% void log %~n0 "unknow system version,application not running"
-goto eof
-
-rem Verify path legitimacy,if the path contain blackspace,the application will not work
-rem 
-rem return boolean if the path is not have blackspace that will return ture,otherwise return false
-:isPathLegitimate
-@call %~f0 boolean isPathLegitimate 1>nul 2>nul
-set %1=true
-if %errorlevel% geq 1 (
-	set _LogUtil=.\core\lib\LogUtil.bat
-	call !_LogUtil! void log %~n0 "Applicathin path:^"%~f0^" contain blackspace,application will not work."
-	set %1=false
+call %~n0 boolean restartAdb
+@rem ³¢ÊÔ 3 ´Î¹Ø±Õ adb
+if "!boolean!"=="false" call %~n0 boolean restartAdb
+if "!boolean!"=="false" call %~n0 boolean restartAdb
+if "!boolean!"=="false" call %~n0 boolean restartAdb
+if "!boolean!"=="false" call %~n0 boolean restartAdb
+if "!boolean!"=="false" (
+	echo Æô¶¯½Å±¾Ê±ÎÞ·¨Æô¶¯ adb ³ÌÐò£¬Çë¼ì²é£º
+	echo 	1¡¢adb µÄ 5037 ¶Ë¿ÚÊÇ·ñ±»Õ¼ÓÃ£¨¿ÉÄÜ±ðµÄ adb ³ÌÐòÕýÔÚÔËÐÐ£©
+	echo	2¡¢ÊÇ·ñ¿ªÆôÁË¸÷ÖÖÁ÷Ã¥ÊÖ»ú¹Ü¼Ò
+	echo  
+	echo °´ÈÎÒâ¼üÍË³ö
+	pause >nul
+	goto eof
 )
+if exist "%tmpdir%" rd /s /q "%tmpdir%" >nul
+mkdir %tmpdir%
+mkdir %listtmp%
+@rem µ±Ç°ÕýÔÚ´¦ÀíµÄÉè±¸µÄÐòÁÐºÅÁÐ±í
+set array_processing_serial=null
+@rem µ±Ç°Á¬½Óµ½µçÄÔµÄÉè±¸ÐòÁÐºÅÁÐ±í£¨ÎÞÊÓ×´Ì¬£©
+set array_devices_serial=null
+:main_loop_1
+	@rem Ã¿ÃëË¢ÐÂÁ¬½ÓÉè±¸ÁÐ±í
+	cls
+	echo ------------------------------------------------------------------------
+	echo ----------------------------- µ±Ç°Éè±¸ÁÐ±í -----------------------------
+	set array_temp_serial=null
+	set array_devices_serial=null
+	adb.exe devices >%tmpdir%\devices
+	for /f "skip=1 tokens=1,2 delims=	" %%i in (%tmpdir%\devices) do (
+		call %~n0 void setDeviceOptSatu %%~i %%~j
+		call %~n0 string getDeviceOptSatu %%~i
+		set tmp_string_1=null
+		call %~n0 string getSatuMappedName !string!
+		set tmp_string_1=!string!
+		@rem  ´¦ÀíÊµÊ±µÄÉè±¸ÁÐ±í
+		echo %%~i	!tmp_string_1!
+		if "!array_devices_serial!" neq "null" (
+			set array_devices_serial=!array_devices_serial!,"%%~i"
+		) else (
+			set array_devices_serial="%%~i"
+		)
+		@rem ±êÖ¾Éè±¸ÊÇ·ñÎªÐÂ¼ÓÈëµÄÉè±¸£¬true ±êÊ¶Éè±¸ÊÇÐÂ¼ÓÈëµÄÉè±¸£¬false ÎªÕýÔÚ´¦ÀíÖÐµÄÉè±¸£¬Ä¬ÈÏÎª true
+		set isNew=true
+		if "%%~j"=="device" (
+			if "!array_temp_serial!" neq "null" (
+				set array_temp_serial=!array_temp_serial!,"%%~i"
+			) else (
+				set array_temp_serial="%%~i"
+			)
+			if "!array_processing_serial!" neq "null" (
+				for %%o in (!array_processing_serial!) do (
+					if "%%~i"=="%%~o" set isNew=false
+					goto main_b_1
+				)
+				:main_b_1
+				if "!isNew!"=="true" start /min %~n0 void coreEntry %%~i
+			) else (
+				start /min %~n0 void coreEntry %%~i
+			)
+		)
+	)
+	set array_processing_serial=!array_temp_serial!
+	for %%i in (%listtmp%) do (
+		set tmp_boolean_1=false
+		for %%o in (!array_devices_serial!) do (
+			if "%%~i"=="%%~o" set tmp_boolean_1=true
+			goto :main_b_2
+		)
+		:main_b_2
+		if "!tmp_boolean_1!"=="false" del /f /q "%listtmp%\%%~i"
+	)
+	@rem µÈ´ýÒ»Ãë
+	ping -n 1 127.0.0.1>nul 1>nul
+goto main_loop_1
 goto eof
 
-rem æ–° ADB å·¥å…·
-:newCore
-call %_LogUtil% void log %~n0 "use new core"
-set corePath=%rootPath%core\win7-win10\
-call %_LogUtil% void log %~n0 "core path:%corePath%"
-set binPath=%corePath%bin\
-call %_LogUtil% void log %~n0 "bin Path:%binPath%"
-set pluginsPath=%corePath%plugins\
-call %_LogUtil% void log %~n0 "plugins path:%pluginsPath%"
-set corePluginsPath=%corePath%\corePluginsPath\
-call %_LogUtil% void log %~n0 core plugins path:%corePluginsPath%"
-call %_LogUtil% void log %~n0 "starting new core..."
-rem call %corePath%core.bat
+@rem Verify path legitimacy,if the path contain blackspace,the application will not work
+@rem 
+@rem return boolean if the path is not have blackspace that will return ture,otherwise return false
+:isPathLegitimate
+@rem @call %~f0 boolean isPathLegitimate 1>nul 2>nul
+@rem set %1=true
+@rem if %errorlevel% geq 1 (
+@rem 	set _LogUtil=.\core\lib\LogUtil.bat
+@rem 	call !_LogUtil! void log %~n0 "Applicathin path:^"%~f0^" contain blackspace,application will not work."
+@rem 	set %1=false
+@rem )
+set result=true
+if not exist %~f0 set result=false
+set %~1=!result!
 goto eof
 
-rem æ—§ ADB å·¥å…·
-:oldCore
-rem call %_LogUtil% void log %~n0 "use old core"
-rem set corePath=%rootPath%core\winXP\
-rem call %_LogUtil% void log %~n0 "core path:%corePath%"
-rem set binPath=%corePath%bin\
-rem call %_LogUtil% void log %~n0 "bin Path:%binPath%"
-rem set pluginsPath=%corePath%plugins\
-rem call %_LogUtil% void log %~n0 "plugins path:%pluginsPath%"
-rem set corePluginsPath=%corePath%\corePluginsPath\
-rem call %_LogUtil% void log %~n0 core plugins path:%corePluginsPath%"
-rem call %_LogUtil% void log %~n0 "starting old core..."
-rem call %corePath%core.bat
+@rem Resata adb.exe
+@rem 
+@rem return boolean If restart adb.exe success that will return true,otherwise return false
+:restartAdb
+set result=true
+@rem Ç¿ÐÐ¹Ø±Õ¶àÓàµÄ adb 
+taskkill /f /im adb.exe 1>nul 2>nul
+@rem ÖØÐÂ¿ªÆô adb ·þÎñ
+adb.exe start-server 1>nul 2>nul
+if %errorlevel% geq 1 (
+	set result=false
+)
+set %~1=!result!
+goto eof
+
+@rem Set device option satu
+@rem The option satu was:
+@rem 	unauthorized	Î´ÑéÖ¤
+@rem	device			ÒÑÁ¬½Ó
+@rem	offline			ÒÑÀëÏß
+@rem	script_running	½Å±¾ÔËÐÐÖÐ
+@rem	complete		Íê³É
+@rem	faild			Ê§°Ü
+@rem 
+@rem return void
+@rem param_3 string Serial number
+@rem param_4 string Statu
+:setDeviceOptSatu
+echo %~4>%listtmp%\%~3
+goto eof
+
+@rem Get device option satu
+@rem 
+@rem return string Statu
+@rem param_3 string Serial number
+:getDeviceOptSatu
+set return=null
+if exist "%listtmp%\%~3" (
+	set /p result=<"%listtmp%\%~3"
+)
+set %~1=!result!
+goto eof
+
+@rem Get satu mapped name
+@rem
+@rem return string Mapped name
+@rem param_3 string statu
+:getSatuMappedName
+set result=null
+if "%~3" neq "" (
+	if "%~3"=="unauthorized" ( 
+		set result=Î´ÑéÖ¤
+		goto getSatuMappedName_b_1
+	)
+	if "%~3"=="device" (
+		set result=ÒÑÁ¬½Ó
+		goto getSatuMappedName_b_1
+	)
+	if "%~3"=="offline" (
+		set result=ÒÑÀëÏß
+		goto getSatuMappedName_b_1
+	)
+	if "%~3"=="script_running" (
+		set resutl=½Å±¾ÔËÐÐÖÐ
+		goto getSatuMappedName_b_1
+	)
+	if "%~3"=="complete" (
+		set result=Íê³É
+		goto getSatuMappedName_b_1
+	)
+	if "%~3"=="faild" (
+		set result=Ê§°Ü
+		goto getSatuMappedName_b_1
+	)
+)
+:getSatuMappedName_b_1
+set %~1=!result!
+goto eof
+
+@rem
+@rem return void
+@rem param_3 string Serial number
+:coreEntry
+title [%~3]
+
+goto close
+goto eof
+
+:close
+exit
 goto eof
 
 :eof
