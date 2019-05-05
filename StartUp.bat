@@ -53,14 +53,33 @@
 
 if "%~2"=="" (
 	setlocal enableDelayedExpansion
-	goto main
+	goto initStaticValue
 )
+:methodBrach
+if "%~2"=="" goto main
 if "%~2"=="isPathLegitimate" goto isPathLegitimate
 if "%~2"=="restartAdb" goto restartAdb
 if "%~2"=="setDeviceOptSatu" goto setDeviceOptSatu
 if "%~2"=="getDeviceOptSatu" goto getDeviceOptSatu
 if "%~2"=="getSatuMappedName" goto getSatuMappedName
-if "%~2"=="coreEntry" goto coreEntry
+if "%~2"=="coreEntry" (
+	setlocal enableDelayedExpansion
+	goto coreEntry
+)
+if "%~2"=="installApp" goto installApp
+if "%~2"=="pushFiles" goto pushFiles
+if "%~2"=="applicationOperation" goto applicationOperation
+if "%~2"=="openSettingActivity" goto openSettingActivity
+if "%~2"=="faild" goto faild
+goto eof
+
+:initStaticValue
+@rem 当前工作根路径
+set rootPath=%~dp0
+set path=%rootpath%bin;!path!
+set tmpdir=%temp%\tmpdir
+set listtmp=%tmpdir%\list
+goto methodBrach
 goto eof
 
 :main
@@ -88,12 +107,7 @@ echo                                                                            
 echo                                                                                      @
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 echo 脚本启动中。。。
-@rem 当前工作根路径
-set rootPath=%~dp0
 cd /d %rootPath%
-set path=%rootpath%bin;!path!
-set tmpdir=%temp%\tmpdir
-set listtmp=%tmpdir%\list
 @rem 检测路径是否包含空格
 call %~n0 boolean isPathLegitimate
 if "!boolean!"=="false" (
@@ -139,9 +153,16 @@ set array_devices_serial=null
 	set array_devices_serial=null
 	adb.exe devices >%tmpdir%\devices
 	for /f "skip=1 tokens=1,2 delims=	" %%i in (%tmpdir%\devices) do (
-		call %~n0 void setDeviceOptSatu %%~i %%~j
-		call %~n0 string getDeviceOptSatu %%~i
 		set tmp_string_1=null
+		if not exist "%listtmp%\%%i" (
+			call %~n0 void setDeviceOptSatu %%~i %%~j
+		) else (
+			call %~n0 string getSatuMappedName !string!
+			if "!string!"=="unauthorized" call %~n0 void setDeviceOptSatu %%~i %%~j
+			if "!string!"=="device" call %~n0 void setDeviceOptSatu %%~i %%~j
+			if "!string!"=="offline" call %~n0 void setDeviceOptSatu %%~i %%~j
+		)
+		call %~n0 string getDeviceOptSatu %%~i
 		call %~n0 string getSatuMappedName !string!
 		set tmp_string_1=!string!
 		@rem  处理实时的设备列表
@@ -248,6 +269,10 @@ goto eof
 :getSatuMappedName
 set result=null
 if "%~3" neq "" (
+	if "%~3"=="null" ( 
+		set result=正在获取状态。。。
+		goto getSatuMappedName_b_1
+	)
 	if "%~3"=="unauthorized" ( 
 		set result=未验证
 		goto getSatuMappedName_b_1
@@ -261,7 +286,7 @@ if "%~3" neq "" (
 		goto getSatuMappedName_b_1
 	)
 	if "%~3"=="script_running" (
-		set resutl=脚本运行中
+		set result=脚本运行中
 		goto getSatuMappedName_b_1
 	)
 	if "%~3"=="complete" (
@@ -281,11 +306,148 @@ goto eof
 @rem return void
 @rem param_3 string Serial number
 :coreEntry
-title [%~3]
-
+title [%~3] --- script_running
+call %~n0 void setDeviceOptSatu %~3 script_running
+echo ---------- 设备：%~3 ----------
+call %~n0 boolean installApp %~3
+if "!boolean!"=="false" goto faild
+echo -------------------------------
+call %~n0 boolean pushFiles %~3
+if "!boolean!"=="false" goto faild
+echo -------------------------------
+call %~n0 boolean applicationOperation %~3
+if "!boolean!"=="false" goto faild
+echo -------------------------------
+call %~n0 void openSettingActivity %~3
+echo -------------------------------
+title [%~3] --- complete
+color 2f
+call %~n0 void setDeviceOptSatu %~3 complete
+ping -n 5 127.0.0.1 >nul 2>nul
 goto close
 goto eof
 
+@rem Install application
+@rem 
+@rem return boolean If success that will return true,otherwise return false 
+@rem param_3 string Device serial number
+:installApp
+set result=true
+set tmp_int_1=0
+for %%t in (.\app\*.apk) do (
+	set /a tmp_int_1= !tmp_int_1! + 1
+	echo 正在安装第 !tmp_int_1! 个应用：
+	echo %%~t
+	adb.exe -s %~3 install -r "%%~t"
+	if %errorlevel% geq 1 (
+		echo %%~t 安装失败
+		set result=false
+		goto installApp_b_1
+	)
+	echo %%~t 安装完成
+)
+:installApp_b_1
+set %~1=!result!
+:goto eof
+
+@rem Push files to the devices
+@rem
+@rem return boolean If success to push than return true,otherwise return false
+@rem param_3 string Device serial number
+:pushFiles
+set result=true
+set tmp_int_1=0
+for %%t in (.\files\*) do (
+	set /a tmp_int_1= !tmp_int_1! + 1
+	echo 正在推送第 !tmp_int_1! 个文件：
+	echo %%~t
+	adb.exe -s %~3 push "%%~t" /sdcard/%%~nxt
+	if %errorlevel% geq 1 (
+		echo %%~t 推送失败
+		set result=false
+		goto pushFiles_b_1
+	)
+	echo %%~t 推送完成
+)
+:pushFiles_b_1
+set %~1=!result!
+goto eof
+
+@rem Applicathin operation for device by "input" command 
+@rem Usage: input [<source>] <command> [<arg>...]
+@rem 
+@rem The sources are:
+@rem       mouse
+@rem       keyboard
+@rem       joystick
+@rem       touchnavigation
+@rem       touchpad
+@rem       trackball
+@rem       stylus
+@rem       dpad
+@rem       touchscreen
+@rem       gamepad
+@rem 
+@rem The commands and default sources are:
+@rem       text <string> (Default: touchscreen)
+@rem       keyevent [--longpress] <key code number or name> ... (Default: keyboard)
+@rem       tap <x> <y> (Default: touchscreen)
+@rem       swipe <x1> <y1> <x2> <y2> [duration(ms)] (Default: touchscreen)
+@rem       press (Default: trackball)
+@rem       roll <dx> <dy> (Default: trackball)
+@rem
+@rem 
+@rem return boolean If success to excute operation file that return true,otherwise return false
+@rem param_3 string Device serial number
+:applicationOperation
+adb.exe -s %~3 shell am force-stop com.android.settings
+adb.exe -s %~3 shell input keyevent KEYCODE_WAKEUP
+adb.exe -s %~3 shell input touchscreen swipe 300 460 300 0 150
+set result=true
+for %%t in (.\opt\*.bat) do (
+	set tmp_string_1=%%~t
+	call %%~ft void opt %~3
+	if %errorlevel% geq 1 (
+		echo %%~t 动作执行失败
+		set result=false
+		goto applicationOperation_b_1
+	)
+	echo %%~t 动作执行完成
+)
+:applicationOperation_b_1
+set %~1=!result!
+goto eof
+
+@rem Open setting activity
+@rem 
+@rem return void
+@rem param_3 string Device serial number
+:openSettingActivity
+adb.exe -s %~3 shell am force-stop com.android.settings
+adb.exe -s %~3 shell input keyevent KEYCODE_WAKEUP
+adb.exe -s %~3 shell input touchscreen swipe 300 460 300 0 150
+adb.exe -s %~3 shell am start -n com.android.settings/com.android.settings.Settings
+goto eof
+
+@rem Script has error,than set consol mode
+@rem
+@rem return void
+:faild
+title [%~3] --- faild
+color 7f
+call %~n0 void setDeviceOptSatu %~3 faild
+echo -------------------------------
+echo 稍等脚本更新状态。。。
+echo 待屏幕恢复黑色，拔掉 USB 线几秒后再重新连接
+ping -n 5 127.0.0.1 >nul 2>nul
+call %~n0 void setDeviceOptSatu %~3 device
+color 0f
+goto close
+goto eof
+
+@rem Close consol
+@rem 
+@rem return void
 :close
 exit
 goto eof
