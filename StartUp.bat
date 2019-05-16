@@ -55,7 +55,7 @@ if "%~2"=="" (
 	setlocal enableDelayedExpansion
 	goto initStaticValue
 )
-:methodBrach
+:methodBranch
 if "%~2"=="" goto main
 if "%~2"=="isPathLegitimate" goto isPathLegitimate
 if "%~2"=="restartAdb" goto restartAdb
@@ -74,12 +74,12 @@ if "%~2"=="faild" goto faild
 goto eof
 
 :initStaticValue
-@rem µ±Ç°¹¤×÷¸ùÂ·¾¶
+@rem å½“å‰å·¥ä½œæ ¹è·¯å¾„
 set rootPath=%~dp0
 set path=%rootpath%bin;!path!
 set tmpdir=%temp%\tmpdir
 set listtmp=%tmpdir%\list
-goto methodBrach
+goto methodBranch
 goto eof
 
 :main
@@ -106,49 +106,49 @@ echo                                                             Mouse.JiangWei 
 echo                                                                                      @
 echo                                                                                      @
 echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-echo ½Å±¾Æô¶¯ÖÐ¡£¡£¡£
+echo è„šæœ¬å¯åŠ¨ä¸­ã€‚ã€‚ã€‚
 cd /d %rootPath%
-@rem ¼ì²âÂ·¾¶ÊÇ·ñ°üº¬¿Õ¸ñ
+@rem æ£€æµ‹è·¯å¾„æ˜¯å¦åŒ…å«ç©ºæ ¼
 call %~n0 boolean isPathLegitimate
 if "!boolean!"=="false" (
-	echo µ±Ç°Â·¾¶ ¡°%~dp0¡± °üº¬¿Õ¸ñ£¬Çë½«´Ë½Å±¾Ó¦ÓÃ·Åµ½ÎÞ¿Õ¸ñµÄÂ·¾¶ÖÐÔÙÔËÐÐ¡Œ
+	echo å½“å‰è·¯å¾„ â€œ%~dp0â€ åŒ…å«ç©ºæ ¼ï¼Œè¯·å°†æ­¤è„šæœ¬åº”ç”¨æ”¾åˆ°æ— ç©ºæ ¼çš„è·¯å¾„ä¸­å†è¿è¡Œî”‘
 	echo 1>nul
 	echo 1>nul
 	echo 1>nul
 	echo 1>nul
 	echo 1>nul
 	echo 1>nul
-	echo °´ÈÎÒâ¼üÍË³ö
+	echo æŒ‰ä»»æ„é”®é€€å‡º
 	pause 1>nul
 	goto eof
 )
 call %~n0 boolean restartAdb
-@rem ³¢ÊÔ 3 ´Î¹Ø±Õ adb
+@rem å°è¯• 3 æ¬¡å…³é—­ adb
 if "!boolean!"=="false" call %~n0 boolean restartAdb
 if "!boolean!"=="false" call %~n0 boolean restartAdb
 if "!boolean!"=="false" call %~n0 boolean restartAdb
 if "!boolean!"=="false" call %~n0 boolean restartAdb
 if "!boolean!"=="false" (
-	echo Æô¶¯½Å±¾Ê±ÎÞ·¨Æô¶¯ adb ³ÌÐò£¬Çë¼ì²é£º
-	echo 	1¡¢adb µÄ 5037 ¶Ë¿ÚÊÇ·ñ±»Õ¼ÓÃ£¨¿ÉÄÜ±ðµÄ adb ³ÌÐòÕýÔÚÔËÐÐ£©
-	echo	2¡¢ÊÇ·ñ¿ªÆôÁË¸÷ÖÖÁ÷Ã¥ÊÖ»ú¹Ü¼Ò
+	echo å¯åŠ¨è„šæœ¬æ—¶æ— æ³•å¯åŠ¨ adb ç¨‹åºï¼Œè¯·æ£€æŸ¥ï¼š
+	echo 	1ã€adb çš„ 5037 ç«¯å£æ˜¯å¦è¢«å ç”¨ï¼ˆå¯èƒ½åˆ«çš„ adb ç¨‹åºæ­£åœ¨è¿è¡Œï¼‰
+	echo	2ã€æ˜¯å¦å¼€å¯äº†å„ç§æµæ°“æ‰‹æœºç®¡å®¶
 	echo  
-	echo °´ÈÎÒâ¼üÍË³ö
+	echo æŒ‰ä»»æ„é”®é€€å‡º
 	pause >nul
 	goto eof
 )
 if exist "%tmpdir%" rd /s /q "%tmpdir%" >nul
 mkdir %tmpdir%
 mkdir %listtmp%
-@rem µ±Ç°ÕýÔÚ´¦ÀíµÄÉè±¸µÄÐòÁÐºÅÁÐ±í
+@rem å½“å‰æ­£åœ¨å¤„ç†çš„è®¾å¤‡çš„åºåˆ—å·åˆ—è¡¨
 set array_processing_serial=null
-@rem µ±Ç°Á¬½Óµ½µçÄÔµÄÉè±¸ÐòÁÐºÅÁÐ±í£¨ÎÞÊÓ×´Ì¬£©
+@rem å½“å‰è¿žæŽ¥åˆ°ç”µè„‘çš„è®¾å¤‡åºåˆ—å·åˆ—è¡¨ï¼ˆæ— è§†çŠ¶æ€ï¼‰
 set array_devices_serial=null
 :main_loop_1
-	@rem Ã¿ÃëË¢ÐÂÁ¬½ÓÉè±¸ÁÐ±í
+	@rem æ¯ç§’åˆ·æ–°è¿žæŽ¥è®¾å¤‡åˆ—è¡¨
 	cls
 	echo ------------------------------------------------------------------------
-	echo ----------------------------- µ±Ç°Éè±¸ÁÐ±í -----------------------------
+	echo ----------------------------- å½“å‰è®¾å¤‡åˆ—è¡¨ -----------------------------
 	set array_temp_serial=null
 	set array_devices_serial=null
 	adb.exe devices >%tmpdir%\devices
@@ -165,14 +165,14 @@ set array_devices_serial=null
 		call %~n0 string getDeviceOptSatu %%~i
 		call %~n0 string getSatuMappedName !string!
 		set tmp_string_1=!string!
-		@rem  ´¦ÀíÊµÊ±µÄÉè±¸ÁÐ±í
+		@rem  å¤„ç†å®žæ—¶çš„è®¾å¤‡åˆ—è¡¨
 		echo %%~i	!tmp_string_1!
 		if "!array_devices_serial!" neq "null" (
 			set array_devices_serial=!array_devices_serial!,"%%~i"
 		) else (
 			set array_devices_serial="%%~i"
 		)
-		@rem ±êÖ¾Éè±¸ÊÇ·ñÎªÐÂ¼ÓÈëµÄÉè±¸£¬true ±êÊ¶Éè±¸ÊÇÐÂ¼ÓÈëµÄÉè±¸£¬false ÎªÕýÔÚ´¦ÀíÖÐµÄÉè±¸£¬Ä¬ÈÏÎª true
+		@rem æ ‡å¿—è®¾å¤‡æ˜¯å¦ä¸ºæ–°åŠ å…¥çš„è®¾å¤‡ï¼Œtrue æ ‡è¯†è®¾å¤‡æ˜¯æ–°åŠ å…¥çš„è®¾å¤‡ï¼Œfalse ä¸ºæ­£åœ¨å¤„ç†ä¸­çš„è®¾å¤‡ï¼Œé»˜è®¤ä¸º true
 		set isNew=true
 		if "%%~j"=="device" (
 			if "!array_temp_serial!" neq "null" (
@@ -198,7 +198,7 @@ set array_devices_serial=null
 		)
 		if "!tmp_boolean_1!"=="false" del /f /q "%listtmp%\%%~ni"
 	)
-	@rem µÈ´ýÒ»Ãë
+	@rem ç­‰å¾…ä¸€ç§’
 	ping -n 1 127.0.0.1>nul 1>nul
 goto main_loop_1
 goto eof
@@ -219,14 +219,14 @@ if not exist %~f0 set result=false
 set %~1=!result!
 goto eof
 
-@rem Resata adb.exe
+@rem Restart adb.exe
 @rem 
 @rem return boolean If restart adb.exe success that will return true,otherwise return false
 :restartAdb
 set result=true
-@rem Ç¿ÐÐ¹Ø±Õ¶àÓàµÄ adb 
+@rem å¼ºè¡Œå…³é—­å¤šä½™çš„ adb 
 taskkill /f /im adb.exe 1>nul 2>nul
-@rem ÖØÐÂ¿ªÆô adb ·þÎñ
+@rem é‡æ–°å¼€å¯ adb æœåŠ¡
 adb.exe start-server 1>nul 2>nul
 if %errorlevel% geq 1 (
 	set result=false
@@ -236,12 +236,12 @@ goto eof
 
 @rem Set device option satu
 @rem The option satu was:
-@rem 	unauthorized	Î´ÑéÖ¤
-@rem	device			ÒÑÁ¬½Ó
-@rem	offline			ÒÑÀëÏß
-@rem	script_running	½Å±¾ÔËÐÐÖÐ
-@rem	complete		Íê³É
-@rem	faild			Ê§°Ü
+@rem 	unauthorized	æœªéªŒè¯
+@rem	device			å·²è¿žæŽ¥
+@rem	offline			å·²ç¦»çº¿
+@rem	script_running	è„šæœ¬è¿è¡Œä¸­
+@rem	complete		å®Œæˆ
+@rem	faild			å¤±è´¥
 @rem 
 @rem return void
 @rem param_3 string Serial number
@@ -270,31 +270,31 @@ goto eof
 set result=null
 if "%~3" neq "" (
 	if "%~3"=="null" ( 
-		set result=ÕýÔÚ»ñÈ¡×´Ì¬¡£¡£¡£
+		set result=æ­£åœ¨èŽ·å–çŠ¶æ€ã€‚ã€‚ã€‚
 		goto getSatuMappedName_b_1
 	)
 	if "%~3"=="unauthorized" ( 
-		set result=Î´ÑéÖ¤
+		set result=æœªéªŒè¯
 		goto getSatuMappedName_b_1
 	)
 	if "%~3"=="device" (
-		set result=ÒÑÁ¬½Ó
+		set result=å·²è¿žæŽ¥
 		goto getSatuMappedName_b_1
 	)
 	if "%~3"=="offline" (
-		set result=ÒÑÀëÏß
+		set result=å·²ç¦»çº¿
 		goto getSatuMappedName_b_1
 	)
 	if "%~3"=="script_running" (
-		set result=½Å±¾ÔËÐÐÖÐ
+		set result=è„šæœ¬è¿è¡Œä¸­
 		goto getSatuMappedName_b_1
 	)
 	if "%~3"=="complete" (
-		set result=Íê³É
+		set result=å®Œæˆ
 		goto getSatuMappedName_b_1
 	)
 	if "%~3"=="faild" (
-		set result=Ê§°Ü
+		set result=å¤±è´¥
 		goto getSatuMappedName_b_1
 	)
 )
@@ -308,7 +308,7 @@ goto eof
 :coreEntry
 title [%~3] --- script_running
 call %~n0 void setDeviceOptSatu %~3 script_running
-echo ---------- Éè±¸£º%~3 ----------
+echo ---------- è®¾å¤‡ï¼š%~3 ----------
 call %~n0 boolean installApp %~3
 if "!boolean!"=="false" goto faild
 echo -------------------------------
@@ -336,15 +336,15 @@ set result=true
 set tmp_int_1=0
 for %%t in (.\app\*.apk) do (
 	set /a tmp_int_1= !tmp_int_1! + 1
-	echo ÕýÔÚ°²×°µÚ !tmp_int_1! ¸öÓ¦ÓÃ£º
+	echo æ­£åœ¨å®‰è£…ç¬¬ !tmp_int_1! ä¸ªåº”ç”¨ï¼š
 	echo %%~t
 	adb.exe -s %~3 install -r "%%~t"
 	if %errorlevel% geq 1 (
-		echo %%~t °²×°Ê§°Ü
+		echo %%~t å®‰è£…å¤±è´¥
 		set result=false
 		goto installApp_b_1
 	)
-	echo %%~t °²×°Íê³É
+	echo %%~t å®‰è£…å®Œæˆ
 )
 :installApp_b_1
 set %~1=!result!
@@ -359,15 +359,15 @@ set result=true
 set tmp_int_1=0
 for %%t in (.\files\*) do (
 	set /a tmp_int_1= !tmp_int_1! + 1
-	echo ÕýÔÚÍÆËÍµÚ !tmp_int_1! ¸öÎÄ¼þ£º
+	echo æ­£åœ¨æŽ¨é€ç¬¬ !tmp_int_1! ä¸ªæ–‡ä»¶ï¼š
 	echo %%~t
 	adb.exe -s %~3 push "%%~t" /sdcard/%%~nxt
 	if %errorlevel% geq 1 (
-		echo %%~t ÍÆËÍÊ§°Ü
+		echo %%~t æŽ¨é€å¤±è´¥
 		set result=false
 		goto pushFiles_b_1
 	)
-	echo %%~t ÍÆËÍÍê³É
+	echo %%~t æŽ¨é€å®Œæˆ
 )
 :pushFiles_b_1
 set %~1=!result!
@@ -408,11 +408,11 @@ for %%t in (.\opt\*.bat) do (
 	set tmp_string_1=%%~t
 	call %%~ft void opt %~3
 	if %errorlevel% geq 1 (
-		echo %%~t ¶¯×÷Ö´ÐÐÊ§°Ü
+		echo %%~t åŠ¨ä½œæ‰§è¡Œå¤±è´¥
 		set result=false
 		goto applicationOperation_b_1
 	)
-	echo %%~t ¶¯×÷Ö´ÐÐÍê³É
+	echo %%~t åŠ¨ä½œæ‰§è¡Œå®Œæˆ
 )
 :applicationOperation_b_1
 set %~1=!result!
@@ -437,8 +437,8 @@ title [%~3] --- faild
 color 7f
 call %~n0 void setDeviceOptSatu %~3 faild
 echo -------------------------------
-echo ÉÔµÈ½Å±¾¸üÐÂ×´Ì¬¡£¡£¡£
-echo ´ýÆÁÄ»»Ö¸´ºÚÉ«£¬°Îµô USB Ïß¼¸ÃëºóÔÙÖØÐÂÁ¬½Ó
+echo ç¨ç­‰è„šæœ¬æ›´æ–°çŠ¶æ€ã€‚ã€‚ã€‚
+echo å¾…å±å¹•æ¢å¤é»‘è‰²ï¼Œæ‹”æŽ‰ USB çº¿å‡ ç§’åŽå†é‡æ–°è¿žæŽ¥
 ping -n 5 127.0.0.1 >nul 2>nul
 call %~n0 void setDeviceOptSatu %~3 device
 color 0f
