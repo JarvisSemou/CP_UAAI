@@ -348,33 +348,35 @@ goto eof
 :installApp
 set result=true
 @rem 要安装的总数
-set tmp_int_1=0
+@rem set tmp_int_1=0
 @rem 目前安装的数量
 set tmp_int_2=0
 set tmp_int_3=0
-for %%t in (.\app\*.apk) do (
-	set /a tmp_int_1= !tmp_int_1! + 1
-)
+@rem for %%t in (.\app\*.apk) do (
+@rem 	set /a tmp_int_1= !tmp_int_1! + 1
+@rem )
 echo 准备开始安装应用。。。。
 adb.exe -s %~3 shell rm /data/local/tmp/*
 for %%t in (.\app\*.apk) do (
 	set /a tmp_int_3= !tmp_int_3! + 1
 	adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
 	@rem start /min %~n0 void installApp_t_1 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt" "/sdcard/%%~nxt"
-	start /min %~n0 void installApp_t_2 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt"
+	@rem start /min %~n0 void installApp_t_2 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt"
+	adb.exe -s %~3 shell pm install /sdcard/%%~nxt
+	echo 第 !tmp_int_3! 个应用 %%~nxt 安装完成
 )
-:installApp_l_1
-set tmp_int_3=0
-for /f %%i in ('adb.exe -s %~3 shell ls /data/local/tmp/installApp_install_*_done') do (
-	set /a tmp_int_3= !tmp_int_3! + 1
-)
-if "!tmp_int_3!"=="!tmp_int_1!" goto :installApp_b_1
-set tmp_int_2=!tmp_int_3!
+@rem :installApp_l_1
+@rem set tmp_int_3=0
+@rem for /f %%i in ('adb.exe -s %~3 shell ls /data/local/tmp/installApp_install_*_done') do (
+@rem 	set /a tmp_int_3= !tmp_int_3! + 1
+@rem )
+@rem if "!tmp_int_3!"=="!tmp_int_1!" goto :installApp_b_1
+@rem set tmp_int_2=!tmp_int_3!
 @rem echo 已安装 !tmp_int_1! 个应用
-ping -n 2 127.0.0.1 >nul 2>nul
-goto installApp_l_1
-echo %%~t !tmp_int_1! 个应用安装完成
-:installApp_b_1
+@rem ping -n 2 127.0.0.1 >nul 2>nul
+@rem goto installApp_l_1
+@rem echo %%~t !tmp_int_1! 个应用安装完成
+@rem :installApp_b_1
 set %~1=!result!
 goto eof
 
