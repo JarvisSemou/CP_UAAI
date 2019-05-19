@@ -159,8 +159,11 @@ set array_devices_serial=null
 	echo ----------------------------- 当前设备列表 -----------------------------
 	set array_temp_serial=null
 	set array_devices_serial=null
-	adb.exe devices >%tmpdir%\devices
-	for /f "skip=1 tokens=1,2 delims=	" %%i in (%tmpdir%\devices) do (
+	if "!array_processing_serial!" neq "null" (
+		for %%t in (!array_processing_serial!) do set tmp_int_i=!tmp_int_1!+1
+	) 
+	echo 当前正常连接设备数量： !tmp_int_1!
+	for /f "skip=1 tokens=1,2 delims=	" %%i in ('adb.exe devices') do (
 		set tmp_string_1=null
 		if not exist "%listtmp%\%%i" (
 			call %~n0 void setDeviceOptSatu %%~i %%~j
@@ -356,8 +359,8 @@ echo 准备开始安装应用。。。。
 adb.exe -s %~3 shell rm /data/local/tmp/*
 for %%t in (.\app\*.apk) do (
 	set /a tmp_int_3= !tmp_int_3! + 1
-	adb.exe -s %~3 push ".\app\%%~nxt" /data/local/tmp/%%~nxt
-	start /min %~n0 void installApp_t_1 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt" "/sdcard/%%~nxt"
+	adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
+	@rem start /min %~n0 void installApp_t_1 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt" "/sdcard/%%~nxt"
 	start /min %~n0 void installApp_t_2 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt"
 )
 :installApp_l_1
@@ -373,7 +376,7 @@ goto installApp_l_1
 echo %%~t !tmp_int_1! 个应用安装完成
 :installApp_b_1
 set %~1=!result!
-:goto eof
+goto eof
 
 @rem 子线程，复制掌机临时目录的应用到 /sdcard 路径
 @rem 
