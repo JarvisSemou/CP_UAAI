@@ -44,7 +44,7 @@
 @rem and win xp system.It will call 1.0.39 version adb tool for  win 10,win 8,win 7,
 @rem ,and call 1.0.31 version adb tool for win vista and win xp system.
 
-@rem win 10		10.0*
+@rem 	win 10		10.0*
 @rem	win 8		6.[23]*
 @rem	win 7		6.1.*
 @rem	win vista	6.0
@@ -152,6 +152,10 @@ mkdir %listtmp%
 set array_processing_serial=null
 @rem 当前连接到电脑的设备序列号列表（无视状态）
 set array_devices_serial=null
+
+
+
+@rem ================= 旧 =====================================================
 :main_loop_1
 	@rem 每秒刷新连接设备列表
 	cls
@@ -210,8 +214,10 @@ set array_devices_serial=null
 		if "!tmp_boolean_1!"=="false" del /f /q "%listtmp%\%%~ni"
 	)
 	@rem 等待一秒
-	ping -n 1 127.0.0.1>nul 1>nul
+	choice /d y /t 1 /n 1>nul
 goto main_loop_1
+
+@rem ================= 旧 =====================================================
 goto eof
 
 @rem Verify path legitimacy,if the path contain blackspace,the application will not work
@@ -337,7 +343,7 @@ echo -------------------------------
 title [%~3] --- complete
 color 2f
 call %~n0 void setDeviceOptSatu %~3 complete
-ping -n 5 127.0.0.1 >nul 2>nul
+choice /d y /t 5 /n 1>nul
 goto close
 goto eof
 
@@ -373,7 +379,7 @@ for %%t in (.\app\*.apk) do (
 @rem if "!tmp_int_3!"=="!tmp_int_1!" goto :installApp_b_1
 @rem set tmp_int_2=!tmp_int_3!
 @rem echo 已安装 !tmp_int_1! 个应用
-@rem ping -n 2 127.0.0.1 >nul 2>nul
+@rem choice /d y /t 2 /n 1>nul
 @rem goto installApp_l_1
 @rem echo %%~t !tmp_int_1! 个应用安装完成
 @rem :installApp_b_1
@@ -387,11 +393,11 @@ goto eof
 @rem param_4 int 当前文件编号
 @rem param_5 string 原始路径
 @rem param_6 string 目标路径
-:installApp_t_1
-adb.exe -s %~3 shell cp %~5 %~6
-adb.exe -s %~3 shell touch /data/local/tmp/installApp_appcopy_%~4_done
-goto close
-goto eof
+@rem :installApp_t_1
+@rem adb.exe -s %~3 shell cp %~5 %~6
+@rem adb.exe -s %~3 shell touch /data/local/tmp/installApp_appcopy_%~4_done
+@rem goto close
+@rem goto eof
 
 @rem 子线程，安装掌机临时目录下的应用并判断应用是否成功从临时目录复制到 /sdcard 路径
 @rem 
@@ -399,18 +405,18 @@ goto eof
 @rem param_3 string Device serial number
 @rem param_4 int 当前文件编号
 @rem param_5 string 安装包路径
-:installApp_t_2
-adb.exe -s %~3 shell pm install %~5
-set tmp_boolean_1=false
-:installApp_t_2_l_1
-adb.exe -s %~3 shell ls /data/local/tmp/installApp_appcopy_%~4_done|findstr data/local/tmp/installApp_appcopy_%~4_done
-if "%errorlevel%"=="0" goto installApp_t_2_l_2
-ping -n 1 127.0.0.1 >nul 2>nul
-goto installApp_t_2_l_1
-:installApp_t_2_l_2
-adb.exe -s %~3 shell touch /data/local/tmp/installApp_install_%~4_done
-goto close
-goto eof
+@rem :installApp_t_2
+@rem adb.exe -s %~3 shell pm install %~5
+@rem set tmp_boolean_1=false
+@rem :installApp_t_2_l_1
+@rem adb.exe -s %~3 shell ls /data/local/tmp/installApp_appcopy_%~4_done|findstr data/local/tmp/installApp_appcopy_%~4_done
+@rem if "%errorlevel%"=="0" goto installApp_t_2_l_2
+@rem choice /d y /t 1 /n 1>nul
+@rem goto installApp_t_2_l_1
+@rem :installApp_t_2_l_2
+@rem adb.exe -s %~3 shell touch /data/local/tmp/installApp_install_%~4_done
+@rem goto close
+@rem goto eof
 
 @rem Push files to the devices
 @rem
@@ -501,7 +507,7 @@ call %~n0 void setDeviceOptSatu %~3 faild
 echo -------------------------------
 echo 稍等脚本更新状态。。。
 echo 待屏幕恢复黑色，拔掉 USB 线几秒后再重新连接
-ping -n 5 127.0.0.1 >nul 2>nul
+choice /d y /t 5 /n 1>nul
 call %~n0 void setDeviceOptSatu %~3 device
 color 0f
 goto close
