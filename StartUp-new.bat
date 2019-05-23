@@ -67,18 +67,23 @@ if "%~2"=="coreEntry" (
 	goto coreEntry
 )
 if "%~2"=="installApp" goto installApp
-if "%~2"=="installApp_t_1" (
-	setlocal enableDelayedExpansion
-	goto installApp_t_1
-)
-if "%~2"=="installApp_t_2" (
-	setlocal enableDelayedExpansion
-	goto installApp_t_2
-)
+@rem if "%~2"=="installApp_t_1" (
+@rem 	setlocal enableDelayedExpansion
+@rem 	goto installApp_t_1
+@rem )
+@rem if "%~2"=="installApp_t_2" (
+@rem 	setlocal enableDelayedExpansion
+@rem 	goto installApp_t_2
+@rem )
 if "%~2"=="pushFiles" goto pushFiles
 if "%~2"=="applicationOperation" goto applicationOperation
 if "%~2"=="openSettingActivity" goto openSettingActivity
 if "%~2"=="faild" goto faild
+if "%~2"=="showDefaultPage" goto showDefaultPage
+if "%~2"=="detectDevice" (
+	setlocal enableDelayedExpansion
+	goto detectDevice
+)
 goto eof
 
 :initStaticValue
@@ -148,11 +153,24 @@ if "!boolean!"=="false" (
 if exist "%tmpdir%" rd /s /q "%tmpdir%" >nul
 mkdir %tmpdir%
 mkdir %listtmp%
-@rem 当前正在处理的设备的序列号列表
-set array_processing_serial=null
-@rem 当前连接到电脑的设备序列号列表（无视状态）
-set array_devices_serial=null
-
+@rem 启动后台设备检测线程
+start /b %~nx0 void detectDevice
+cls
+call %~n0 void showDefaultPage
+@rem 根据设备检测线程的状态更新界面
+:main_loop_1
+if exist "%tmpdir%\bg_t_sata" (
+	set /p tmp_boolean_1=<bg_t_sata
+	if "!tmp_boolean_1!"=="true" (
+		if exist "%tmpdir%\newPage" (
+			cls
+			for /f %%t in (%tmpdir%\newPage) do echo %%t
+			echo false>%tmpdir%\bg_t_sata
+		)
+	)
+)
+choice /d y /t 1 /n 1>nul
+goto main_loop_1
 
 
 @rem ================= 旧 =====================================================
@@ -218,6 +236,77 @@ set array_devices_serial=null
 goto main_loop_1
 
 @rem ================= 旧 =====================================================
+goto eof
+
+@rem Show default page
+@rem 
+@rem return void
+:showDefaultPage
+echo ------------------------------------------------------------------------
+echo ----------------------------- 当前设备列表 -----------------------------
+echo 当前正常连接设备数量： 0
+goto eof
+
+@rem Detect device and notic main thread update page
+@rem 
+@rem return void
+:detectDevice
+@rem 当前正在处理的设备的序列号列表
+set array_processing_serial=null
+@rem 当前连接到电脑的设备序列号列表（无视状态）
+set array_devices_serial=null
+:detectDevice_loop_1
+	set array_temp_serial=null
+	set array_devices_serial=null
+	for /f "skip=1 tokens=1,2 delims=	" %%i in ('adb.exe devices') do (
+		set tmp_string_1=null
+		if not exist "%listtmp%\%%i" (
+			call %~n0 void setDeviceOptSatu %%~i %%~j
+		) else (
+			call %~n0 string getSatuMappedName !string!
+			if "!string!"=="unauthorized" call %~n0 void setDeviceOptSatu %%~i %%~j
+			if "!string!"=="device" call %~n0 void setDeviceOptSatu %%~i %%~j
+			if "!string!"=="offline" call %~n0 void setDeviceOptSatu %%~i %%~j
+		)
+		call %~n0 string getDeviceOptSatu %%~i
+		call %~n0 string getSatuMappedName !string!
+		set tmp_string_1=!string!
+		@rem  处理实时的设备列表
+		echo %%~i	!tmp_string_1!
+		if "!array_devices_serial!" neq "null" (
+			set array_devices_serial=!array_devices_serial!,"%%~i"
+		) else (
+			set array_devices_serial="%%~i"
+		)
+		@rem 标志设备是否为新加入的设备，true 标识设备是新加入的设备，false 为正在处理中的设备，默认为 true
+		set isNew=true
+		if "%%~j"=="device" (
+			if "!array_temp_serial!" neq "null" (
+				set array_temp_serial=!array_temp_serial!,"%%~i"
+			) else (
+				set array_temp_serial="%%~i"
+			)
+			if "!array_processing_serial!" neq "null" (
+				for %%o in (!array_processing_serial!) do (
+					if "%%~i"=="%%~o" set isNew=false
+				)
+				if "!isNew!"=="true" start /min %~n0 void coreEntry %%~i
+			) else (
+				start /min %~n0 void coreEntry %%~i
+			)
+		)
+	)
+	set array_processing_serial=!array_temp_serial!
+	for %%i in (%listtmp%\*) do (
+		set tmp_boolean_1=false
+		for %%o in (!array_devices_serial!) do (
+			if "%%~ni"=="%%~o" set tmp_boolean_1=true
+		)
+		if "!tmp_boolean_1!"=="false" del /f /q "%listtmp%\%%~ni"
+	)
+	@rem 等待一秒
+	choice /d y /t 1 /n 1>nul
+goto detectDevice_loop_1
 goto eof
 
 @rem Verify path legitimacy,if the path contain blackspace,the application will not work
