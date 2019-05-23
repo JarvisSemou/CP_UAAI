@@ -163,8 +163,9 @@ set array_devices_serial=null
 	echo ----------------------------- 当前设备列表 -----------------------------
 	set array_temp_serial=null
 	set array_devices_serial=null
+	set tmp_int_1=0
 	if "!array_processing_serial!" neq "null" (
-		for %%t in (!array_processing_serial!) do set tmp_int_i=!tmp_int_1!+1
+		for %%t in (!array_processing_serial!) do set /a tmp_int_1=!tmp_int_1!+1
 	) 
 	echo 当前正常连接设备数量： !tmp_int_1!
 	for /f "skip=1 tokens=1,2 delims=	" %%i in ('adb.exe devices') do (
