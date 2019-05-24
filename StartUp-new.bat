@@ -159,21 +159,21 @@ goto eof
 	call %~n0 void showDefaultPage
 	@rem 根据设备检测线程的状态更新界面
 	:main_loop_1
-	if exist "%tmpdir%\bg_t_sata" (
-		set /p tmp_boolean_1=<bg_t_sata
+	if exist "%tmpdir%\isUpdateUI" (
+		set /p tmp_boolean_1=<isUpdateUI
 		if "!tmp_boolean_1!"=="true" (
 			if exist "%tmpdir%\newPage" (
 				cls
 				for /f %%t in (%tmpdir%\newPage) do echo %%t
-				echo false>%tmpdir%\bg_t_sata
+				echo false>%tmpdir%\isUpdateUI
 			)
 		)
 	)
 	choice /d y /t 1 /n 1>nul
-goto main_loop_1
+	goto main_loop_1
 
 
-@rem ================= 旧 =====================================================
+	@rem ================= 旧 =====================================================
 	@rem :main_loop_1
 	@rem 每秒刷新连接设备列表
 	cls
@@ -235,29 +235,51 @@ goto main_loop_1
 	@rem 等待一秒
 	choice /d y /t 1 /n 1>nul
 	goto main_loop_1
-	
+	@rem ================= 旧 =====================================================
 goto eof
 
 @rem Show default page
 @rem 
 @rem return void
 :showDefaultPage
-	echo ------------------------------------------------------------------------
-	echo ----------------------------- 当前设备列表 -----------------------------
+	echo -----------------------------   状态信息   -----------------------------
+	echo 1>nul
 	echo 当前正常连接设备数量： 0
+	echo 1>nul
+	echo ----------------------------- 当前设备列表 -----------------------------
 goto eof
 
 @rem Detect device and notic main thread update page
 @rem 
 @rem return void
 :detectDevice
-	@rem 当前正在处理的设备的序列号列表
+	@rem 当前正在运行脚本的设备的序列号列表，其元素的状态是'device'
 	set array_processing_serial=null
 	@rem 当前连接到电脑的设备序列号列表（无视状态）
 	set array_devices_serial=null
+	@rem 差异化列表，此列表中的序列号变量将被清楚内存或仅仅更新状态提示信息。此列表的元素由 array_processing_serial 与 array_devices_serial 作比较
+	@rem 得出，存放前者中无法在后者找到或能在或者中找到但状态不是'device'的变量（说明设备已与电脑断开连接或连接状态已改变，如从'device'状态变为'offline'状态）
+	set array_diff_1=null
+	@rem 差异化列表，此列表中的序列号将被添加到 array_processing_serial 列表中。此列表中的元素由 array_devices_serial 与排除状态更新后的元素的 array_processing_serial 列表
+	@rem 作比较得出，存放将添加到 array_processing_serial 列表的状态为'device' 的序列号元素
+	set array_diff_2=null
+	@rem 是否在主线程更新 UI 的标志，true 通知主线程更新 UI，false 什么也不做，默认为 false
+	set isUpdateUI=false
 	:detectDevice_loop_1
-		set array_temp_serial=null
+		set array_temp_processing_serial=null
 		set array_devices_serial=null
+		@rem 更新连接到电脑的设备的列表
+		for /f "skip=1 tokens=1,2 delims=	" %%i in ('adb.exe devices') do (
+			if "!array_devices_serial!" neq "null" (
+				set array_devices_serial=!array_devices_serial!,"%%i"
+			) else (
+				set array_devices_serial="%%i"
+			)
+			@rem 存对应序列号的连接状态
+			set %%i=%%j
+		)
+		
+		@rem 旧==========================================
 		for /f "skip=1 tokens=1,2 delims=	" %%i in ('adb.exe devices') do (
 			set tmp_string_1=null
 			if not exist "%listtmp%\%%i" (
