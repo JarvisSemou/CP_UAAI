@@ -44,7 +44,7 @@
 @rem and win xp system.It will call 1.0.39 version adb tool for  win 10,win 8,win 7,
 @rem ,and call 1.0.31 version adb tool for win vista and win xp system.
 
-@rem win 10		10.0*
+@rem 	win 10		10.0*
 @rem	win 8		6.[23]*
 @rem	win 7		6.1.*
 @rem	win vista	6.0
@@ -84,6 +84,7 @@ if "%~2"=="" (
 		setlocal enableDelayedExpansion
 		goto detectDevice
 	)
+	if "%~2"=="calculateDifference" goto calculateDifference
 goto eof
 
 :initStaticValue
@@ -246,7 +247,7 @@ goto eof
 	echo 1>nul
 	echo 当前正常连接设备数量： 0
 	echo 1>nul
-	echo ----------------------------- 当前设备列表 -----------------------------
+	echo -----------------------------   设备列表   -----------------------------
 goto eof
 
 @rem Detect device and notic main thread update page
@@ -255,29 +256,89 @@ goto eof
 :detectDevice
 	@rem 当前正在运行脚本的设备的序列号列表，其元素的状态是'device'
 	set array_processing_serial=null
+	@rem 相对于当前的连接到电脑的的设备的序列号列表而言为上一次的设备序列号列表
+	set array_devices_serial_old=null
 	@rem 当前连接到电脑的设备序列号列表（无视状态）
 	set array_devices_serial=null
-	@rem 差异化列表，此列表中的序列号变量将被清楚内存或仅仅更新状态提示信息。此列表的元素由 array_processing_serial 与 array_devices_serial 作比较
+	@rem 差异化列表，此列表中的序列号变量将被清除内存或仅仅更新状态提示信息。此列表的元素由 array_devices_serial_old 与 array_devices_serial 作比较
 	@rem 得出，存放前者中无法在后者找到或能在或者中找到但状态不是'device'的变量（说明设备已与电脑断开连接或连接状态已改变，如从'device'状态变为'offline'状态）
 	set array_diff_1=null
-	@rem 差异化列表，此列表中的序列号将被添加到 array_processing_serial 列表中。此列表中的元素由 array_devices_serial 与排除状态更新后的元素的 array_processing_serial 列表
+	@rem 差异化列表，此列表中的序列号将被添加到 array_processing_serial 列表中。此列表中的元素由 array_devices_serial 与 array_devices_serial_old 列表
 	@rem 作比较得出，存放将添加到 array_processing_serial 列表的状态为'device' 的序列号元素
 	set array_diff_2=null
 	@rem 是否在主线程更新 UI 的标志，true 通知主线程更新 UI，false 什么也不做，默认为 false
 	set isUpdateUI=false
 	:detectDevice_loop_1
-		set array_temp_processing_serial=null
+		@rem set array_temp_processing_serial=null
+		@rem ===========================================================================================
+		@rem 给自己埋了个大坑，两个列表中的元素的名字一样，所以以元素名（序列号）为变量名存储的设备状态一样，无法区分新旧列表的设备状态
+		@rem ===========================================================================================
+		set array_devices_serial_old=!array_devices_serial!
 		set array_devices_serial=null
+		set array_diff_1=null
+		set array_diff_2=null
 		@rem 更新连接到电脑的设备的列表
 		for /f "skip=1 tokens=1,2 delims=	" %%i in ('adb.exe devices') do (
 			if "!array_devices_serial!" neq "null" (
-				set array_devices_serial=!array_devices_serial!,"%%i"
+				set array_devices_serial=!array_devices_serial!,"%%~i"
 			) else (
-				set array_devices_serial="%%i"
+				set array_devices_serial="%%~i"
 			)
 			@rem 存对应序列号的连接状态
-			set %%i=%%j
+			set %%~i=%%~j
 		)
+		@rem 如果没有设备连接则跳过后面的步骤并延迟 1 秒检测新设备，节省 CPU
+		if "!array_devices_serial!"=="null" (
+			if "!array_devices_serial_old!" neq "null" (
+				call %~n0 void updateUI !array_processing_serial! 
+			)
+			choice /d y /t 1 /n 1>nul
+			goto detectDevice_loop_1
+		)
+		if "!array_devices_serial_old!"=="null" (
+			
+		)
+		call %~n0 tmp_any_1 calculateDifference "!array_devices_serial_old!" "!array_devices_serial!"
+		set array_diff_1=!tmp_any_1!
+		call %~n0 tmp_any_1 calculateDifference "!array_devices_serial!" "!array_devices_serial_old!"
+		set array_diff_2=!tmp_any_1!
+		if "!array_diff_1!" neq "null" set isUpdateUI=true
+		if "!array_diff_2!" neq "null" set isUpdateUI=true
+		for %%i in (!array_diff_1!) do (
+			if defined %%~i (
+				if exist "%listtmp%\%%~i" (
+					call %~n0 string getSatuMappedName !string!
+					if "!string!"=="unauthorized" call %~n0 void setDeviceOptSatu %%~i %%~j
+					if "!string!"=="device" call %~n0 void setDeviceOptSatu %%~i %%~j
+					if "!string!"=="offline" call %~n0 void setDeviceOptSatu %%~i %%~j
+				) else (
+					call %~n0 void setDeviceOptSatu %%~i !%%~i!
+				)
+			) else (
+				if exist "%listtmp%\%%i" del /f /q %listtmp%\%%i
+			)
+		)
+		
+		
+		
+		
+		
+		
+		@rem ========================= 暂时不管，感觉性能没有多大提升 ==========================
+		@rem 计算差异化列表 array_diff_1 
+		if "!array_processing_serial!" neq "null" (
+			set array_diff_1=null
+			@rem 判断 array_processing_serial 中的元素是否符合 array_diff_1 列表的元素要求的定义的标致，true 为符合，false 为不符合，默认为 false
+			set tmp_boolean_1=false
+			@rem 标识需要存放到 array_diff_1 列表的元素的类型，not_found 为当前元素无法在 array_processing_serial 中找到，state_changed 为当前元素的状态已不是 'device',默认为 not_found
+			set tmp_any_1=not_found
+			for %%e in (!array_processing_serial!) do (
+				for %%t in (!array_devices_serial!) do (
+					
+				)
+			)
+		)
+		@rem ========================= 暂时不管
 		
 		@rem 旧==========================================
 		for /f "skip=1 tokens=1,2 delims=	" %%i in ('adb.exe devices') do (
@@ -328,8 +389,13 @@ goto eof
 		)
 		@rem 等待一秒
 		choice /d y /t 1 /n 1>nul
+		@rem 旧==========================================
+		
 	goto detectDevice_loop_1
 goto eof
+
+
+
 
 @rem Verify path legitimacy,if the path contain blackspace,the application will not work
 @rem 
@@ -362,6 +428,39 @@ set result=true
 	set %~1=!result!
 goto eof
 
+@rem Calculate difference between old serial array and new serial array
+@rem
+@rem return array Difference element
+@rem param_3 array Array
+@rem param_4 array Array
+:calculateDifference
+	set array_diff=null
+	for %%i in (!%~3!) do (
+		set tmp_boolean_1=false
+		for %%t in (!%~4!) do (
+			if "%%~i"=="%%~t" (
+				set tmp_boolean_1=true
+				if "!%%~i!" neq "!%%~t!" (
+					if "!array_diff!" neq "null" (
+						set array_diff=!array_diff!,"%%~i"
+					) else (
+						set array_diff="%%~i"
+					)
+				)
+			)
+		)
+		if "!tmp_boolean_1!"=="false" (
+			set %%~i=
+			if "!array_diff!" neq "null" (
+				set array_diff=!array_diff!,"%%~i"
+			) else (
+				set array_diff="%%~i"
+			)
+		)
+	)
+	set %~1=!array_diff!
+goto eof
+
 @rem Set device option satu
 @rem The option satu was:
 @rem 	unauthorized	未验证
@@ -376,7 +475,7 @@ goto eof
 @rem param_4 string Statu
 :setDeviceOptSatu
 	echo %~4>%listtmp%\%~3
-	echo true>%tmpdir%\isUpdateUI
+	@rem echo true>%tmpdir%\isUpdateUI
 goto eof
 
 @rem Get device option satu
