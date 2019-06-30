@@ -57,8 +57,15 @@ if "%~2"=="" (
 )
 :methodBrach
 	if "%~2"=="" goto main
+	if "%~2"=="printInitPage" goto printInitPage
+	if "%~2"=="printPathErrPage" goto printPathErrPage
+	if "%~2"=="printNostartAdbPage_1" goto printNostartAdbPage_1
+	if "%~2"=="printNostartAdbPage_2" goto printNostartAdbPage_2
 	if "%~2"=="isPathLegitimate" goto isPathLegitimate
+	if "%~2"=="is5037Occupied" goto is5037Occupied
+	if "%~2"=="get5037ProcessName" goto get5037ProcessName
 	if "%~2"=="restartAdb" goto restartAdb
+	if "%~2"=="close5037ProcessByName" goto close5037ProcessByName
 	if "%~2"=="setDeviceOptSatu" goto setDeviceOptSatu
 	if "%~2"=="getDeviceOptSatu" goto getDeviceOptSatu
 	if "%~2"=="getSatuMappedName" goto getSatuMappedName
@@ -97,59 +104,37 @@ goto eof
 goto eof
 
 :main
-	echo [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[@
-	echo                                                                                      @
-	echo                                                                                      @
-	echo                                                                                      @
-	echo                                                                                      @
-	echo                                                                                      @
-	echo         ]@@@@@`  @@@@@\]`           ,@@@     /@@.     =@@@`        .@@@\      @@@    @
-	echo      ,@@@@@@@@@  @@@@@@@@@^^         =@@@     @@@.    ,@@@@@        /@@@@^^     @@@    @
-	echo     =@@@.        @@@   =@@@         =@@@     @@@.   .@@@=@@^^      =@@^^@@@.    @@@    @
-	echo     @@@^^         @@@  ,@@@/         =@@@     @@@.   /@@` @@@`    ,@@/ =@@\    @@@    @
-	echo     @@@^^         @@@@@@@/`          ,@@@     @@@.  =@@\]]/@@@.  .@@@]]]/@@^^   @@@    @
-	echo     =@@@`     .  @@@                 @@@^^   ,@@@  ,@@@@@@@@@@\  /@@@@@@@@@@`  @@@    @
-	echo      ,@@@@@@@@@  @@@                 ,@@@@@@@@@.  @@@`     @@@^^=@@@     =@@@  @@@    @
-	echo         .[[[[.   **,                    ,[[[`    ,**`      .`*`,*,.      ,*,. **,    @
-	echo                                                                                      @
-	echo                            \@@@@@@@^^                                                 @
-	echo                                                                                      @
-	echo                                                                                      @
-	echo                                                                                      @
-	echo                                                             Mouse.JiangWei           @
-	echo                                                                                      @
-	echo                                                                                      @
-	echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-	echo 脚本启动中。。。
+	call %~n0 void printInitPage
 	cd /d %rootPath%
 	@rem 检测路径是否包含空格
-	call %~n0 boolean isPathLegitimate
+	call .\%~n0 boolean isPathLegitimate
 	if "!boolean!"=="false" (
-		echo 当前路径 “%~dp0” 包含空格，请将此脚本应用放到无空格的路径中再运行
-		echo 1>nul
-		echo 1>nul
-		echo 1>nul
-		echo 1>nul
-		echo 1>nul
-		echo 1>nul
-		echo 按任意键退出
-		pause 1>nul
+		call %~n0 void printPathErrPage
 		goto eof
 	)
-	call %~n0 boolean restartAdb
-	@rem 尝试 3 次关闭 adb
-	if "!boolean!"=="false" call %~n0 boolean restartAdb
-	if "!boolean!"=="false" call %~n0 boolean restartAdb
-	if "!boolean!"=="false" call %~n0 boolean restartAdb
-	if "!boolean!"=="false" call %~n0 boolean restartAdb
-	if "!boolean!"=="false" (
-		echo 启动脚本时无法启动 adb 程序，请检查：
-		echo 	1、adb 的 5037 端口是否被占用（可能别的 adb 程序正在运行）
-		echo	2、是否开启了各种流氓手机管家
-		echo  
-		echo 按任意键退出
-		pause >nul
-		goto eof
+	@rem 判断当前占用 5037 端口的进程
+	call %~n0 boolean is5037Occupied
+	if "!boolean!"=="true" (
+		call %~n0 string get5037ProcessName
+		if "!string!"=="adb.exe" (
+			@rem adb 进程正在占用 5037 端口,尝试 3 次使用当前脚本的 adb 程序
+			call %~n0 boolean restartAdb
+			if "!boolean!"=="false" call %~n0 boolean restartAdb
+			if "!boolean!"=="false" call %~n0 boolean restartAdb
+			if "!boolean!"=="false" (
+				call %~n0 void printNostartAdbPage_1
+				goto eof
+			)
+		) else (
+			@rem 非 adb 进程在占用 5037 端口，先尝试 3 此关闭占用 5037 端口的进程，如果失败则建议手动关闭相应进程
+			call %~n0 boolean close5037ProcessByName "!string!"
+			if "!boolean!"=="false" call %~n0 boolean close5037ProcessByName "!string!"
+			if "!boolean!"=="false" call %~n0 boolean close5037ProcessByName "!string!"
+			if "!boolean!"=="false" (
+				call %~n0 void printNostartAdbPage_2 "!string!"
+				goto eof
+			)
+		)
 	)
 	if exist "%tmpdir%" rd /s /q "%tmpdir%" >nul
 	mkdir %tmpdir%
@@ -250,7 +235,7 @@ goto eof
 	echo -----------------------------   设备列表   -----------------------------
 goto eof
 
-@rem Detect device and notic main thread update page
+@rem Detect device and notice main thread update page
 @rem 
 @rem return void
 :detectDevice
@@ -394,8 +379,93 @@ goto eof
 	goto detectDevice_loop_1
 goto eof
 
+@rem Print init page
+@rem
+@rem return void
+:printInitPage
+	echo [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[@
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo         ]@@@@@`  @@@@@\]`           ,@@@     /@@.     =@@@`        .@@@\      @@@    @
+	echo      ,@@@@@@@@@  @@@@@@@@@^^         =@@@     @@@.    ,@@@@@        /@@@@^^     @@@    @
+	echo     =@@@.        @@@   =@@@         =@@@     @@@.   .@@@=@@^^      =@@^^@@@.    @@@    @
+	echo     @@@^^         @@@  ,@@@/         =@@@     @@@.   /@@` @@@`    ,@@/ =@@\    @@@    @
+	echo     @@@^^         @@@@@@@/`          ,@@@     @@@.  =@@\]]/@@@.  .@@@]]]/@@^^   @@@    @
+	echo     =@@@`     .  @@@                 @@@^^   ,@@@  ,@@@@@@@@@@\  /@@@@@@@@@@`  @@@    @
+	echo      ,@@@@@@@@@  @@@                 ,@@@@@@@@@.  @@@`     @@@^^=@@@     =@@@  @@@    @
+	echo         .[[[[.   **,                    ,[[[`    ,**`      .`*`,*,.      ,*,. **,    @
+	echo                                                                                      @
+	echo                            \@@@@@@@^^                                                 @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                             Mouse.JiangWei           @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	echo 脚本启动中。。。
+goto eof
 
+@rem Print path error page
+@rem
+@rem return void
+:printPathErrPage
+	cls 
+	echo ==================================================================================
+	echo 当前路径 “%~dp0” 包含空格，请将此脚本应用放到无空格的路径中再运行
+	echo 1>nul
+	echo 1>nul
+	echo 1>nul
+	echo 1>nul
+	echo 1>nul
+	echo 1>nul
+	echo 按任意键退出脚本
+	echo 1>nul
+	echo 1>nul
+	echo ==================================================================================
+	pause 1>nul
+goto eof
 
+@rem Print no start adb page 1
+@rem
+@rem return void
+:printNostartAdbPage_1
+	cls
+	echo ==================================================================================
+	echo 启动脚本时无法启动 adb 程序服务，原因为 adb 程序的 5037 端口正被另一个 adb 程序
+	echo 占用且无法将其关闭，请在任务管理器里手动关闭占用 5037 端口的 adb 程序
+	echo 1>nul
+	echo 1>nul
+	echo 按任意键退出脚本
+	echo 1>nul
+	echo 1>nul
+	echo ==================================================================================
+	pause 1>nul
+goto eof
+
+@rem Print no start adb page 2
+@rem
+@rem param_3 processName Process name that occupied prot 5037
+@rem return void
+:printNostartAdbPage_2
+	cls
+	echo ==================================================================================
+	echo 启动脚本时无法启动 adb 程序服务，原因为 adb 程序的 5037 端口正被 “%~n3” 进程占用且
+	echo 脚本尝试 3 此关闭该进程都未成功，请手动关闭该进程后再启动脚本。
+	echo 1>nul
+	echo 注：该类进程一般为 “XX手机管家”、“XX手机助手”、“XX手机清理大师”等流氓软件，可以直接
+	echo 	它们的菜单中将他们关闭。
+	echo 1>nul
+	echo 1>nul
+	echo 按任意键退出脚本
+	echo 1>nul
+	echo 1>nul
+	echo ==================================================================================
+	pause 1>nul
+goto eof
 
 @rem Verify path legitimacy,if the path contain blackspace,the application will not work
 @rem 
@@ -413,6 +483,30 @@ goto eof
 	set %~1=!result!
 goto eof
 
+@rem Judge port 5037 Occupied or not
+@rem 
+@rem return boolean If port 5037 Occupied that return true,otherwise return false  
+:is5037Occupied
+	set result=false
+	netstat -ano|findstr 5037 1>nul
+	if %errorlevel% gtr 0 set result=true
+	set %~1=!result!
+goto eof
+
+@rem Get process name which occupied prot 5037
+@rem
+@rem return string Process name which occupied prot 5037,if no process occupied 5037 prot that will return null
+:get5037ProcessName
+	set result=null
+	set tmp_int_1=0
+	for /f "tokens=5" %%i in ('netstat -ano^|findstr 5037') do (
+		for /f "usebackq" %%n in (`tasklist /nh /fi "pid eq %%i"`) do (
+			set result=%%n
+		)
+	)
+	set %~1=!result!
+goto eof
+
 @rem Resata adb.exe
 @rem 
 @rem return boolean If restart adb.exe success that will return true,otherwise return false
@@ -425,6 +519,17 @@ set result=true
 	if %errorlevel% geq 1 (
 		set result=false
 	)
+	set %~1=!result!
+goto eof
+
+@rem Close the process which occupied the prot 5037
+@rem
+@rem param_3 processName The Process name 
+@rem return boolean If success that return true,otherwise return false
+:close5037ProcessByName
+	set result=false
+	taskkill /f /im %~n3 1>nul 2>nul
+	if %errorlevel%==0 set result=true
 	set %~1=!result!
 goto eof
 
