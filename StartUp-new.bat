@@ -383,6 +383,7 @@ goto eof
 @rem
 @rem return void
 :printInitPage
+	title CP_UAAI  ---  Mouse.JiangWei     :-D
 	echo [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[@
 	echo                                                                                      @
 	echo                                                                                      @
