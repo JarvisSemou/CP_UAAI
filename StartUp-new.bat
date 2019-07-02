@@ -61,11 +61,16 @@ if "%~2"=="" (
 	if "%~2"=="printPathErrPage" goto printPathErrPage
 	if "%~2"=="printNostartAdbPage_1" goto printNostartAdbPage_1
 	if "%~2"=="printNostartAdbPage_2" goto printNostartAdbPage_2
+	if "%~2"=="printInitPluginConfigErrPage" goto printInitPluginConfigErrPage
 	if "%~2"=="isPathLegitimate" goto isPathLegitimate
 	if "%~2"=="is5037Occupied" goto is5037Occupied
 	if "%~2"=="get5037ProcessName" goto get5037ProcessName
 	if "%~2"=="restartAdb" goto restartAdb
 	if "%~2"=="close5037ProcessByName" goto close5037ProcessByName
+	if "%~2"=="initPluginConfig" goto initPluginConfig
+	if "%~2"=="registPlugin" goto registPlugin
+	if "%~2"=="createNewPluginConfigFile" goto createNewPluginConfigFile
+	if "%~2"=="executeLifeCycle" goto executeLifeCycle
 	if "%~2"=="setDeviceOptSatu" goto setDeviceOptSatu
 	if "%~2"=="getDeviceOptSatu" goto getDeviceOptSatu
 	if "%~2"=="getSatuMappedName" goto getSatuMappedName
@@ -83,7 +88,6 @@ if "%~2"=="" (
 	@rem 	goto installApp_t_2
 	@rem )
 	if "%~2"=="pushFiles" goto pushFiles
-	if "%~2"=="applicationOperation" goto applicationOperation
 	if "%~2"=="openSettingActivity" goto openSettingActivity
 	if "%~2"=="faild" goto faild
 	if "%~2"=="showDefaultPage" goto showDefaultPage
@@ -100,6 +104,22 @@ goto eof
 	set path=%rootpath%bin;!path!
 	set tmpdir=%temp%\tmpdir
 	set listtmp=%tmpdir%\list
+	@rem onScriptFirstStart 生命周期的插件调用链
+	set lifeCycle_onScriptFirstStart=null
+	@rem onCoreStart 生命周期的插件调用链
+	set lifeCycle_onCoreStart=null
+	@rem onBeforeInstallingApp 生命周期的插件调用链
+	set lifeCycle_onBeforeInstallingApp=null
+	@rem onAfterInstallingApp 生命周期的插件调用链
+	set lifeCycle_onAfterInstallingApp=null
+	@rem onInstallAppCompleted 生命轴承的插件调用链
+	set lifeCycle_onInstallAppCompleted=null
+	@rem onBeforePushingFile 生命周期的插件调用链
+	set lifeCycle_onBeforePushingFile=null
+	@rem onAfterPushingFile 生命周期的插件调用链
+	set lifeCycle_onAfterPushingFile=null
+	@rem onCoreFinish 生命周期的插件调用链
+	set lifeCycle_onCoreFinish=null
 	goto methodBrach
 goto eof
 
@@ -107,12 +127,14 @@ goto eof
 	call %~n0 void printInitPage
 	cd /d %rootPath%
 	@rem 检测路径是否包含空格
+	echo 检查脚本路径。。。
 	call .\%~n0 boolean isPathLegitimate
 	if "!boolean!"=="false" (
 		call %~n0 void printPathErrPage
 		goto eof
 	)
 	@rem 判断当前占用 5037 端口的进程
+	echo 检查 5037 端口。。。
 	call %~n0 boolean is5037Occupied
 	if "!boolean!"=="true" (
 		call %~n0 string get5037ProcessName
@@ -136,9 +158,19 @@ goto eof
 			)
 		)
 	)
+	echo 初始化缓存目录。。。
 	if exist "%tmpdir%" rd /s /q "%tmpdir%" >nul
 	mkdir %tmpdir%
 	mkdir %listtmp%
+	echo 初始化插件。。。
+	@rem 初始化插件配置
+	call %~n0 boolean initPluginConfig
+	if "!boolean!"=="false" (
+		call %~n0 void printInitPluginConfigErrPage
+		goto eof
+	)
+	echo 启动脚本。。。
+	call %~n0 void executeLifeCycle "onScriptFirstStart" 
 	@rem 启动后台设备检测线程
 	start /b %~nx0 void detectDevice
 	cls
@@ -449,8 +481,8 @@ goto eof
 
 @rem Print no start adb page 2
 @rem
-@rem param_3 processName Process name that occupied prot 5037
 @rem return void
+@rem param_3 processName Process name that occupied prot 5037
 :printNostartAdbPage_2
 	cls
 	echo ==================================================================================
@@ -459,6 +491,23 @@ goto eof
 	echo 1>nul
 	echo 注：该类进程一般为 “XX手机管家”、“XX手机助手”、“XX手机清理大师”等流氓软件，可以直接
 	echo 	它们的菜单中将他们关闭。
+	echo 1>nul
+	echo 1>nul
+	echo 按任意键退出脚本
+	echo 1>nul
+	echo 1>nul
+	echo ==================================================================================
+	pause 1>nul
+goto eof
+
+@rem Print initialize plugin config error page
+@rem
+@rem return void
+:printInitPluginConfigErrPage
+	cls
+	echo ==================================================================================
+	echo 脚本在根据 .\opt 目录下的 plugin_config.txt 配置文件初始化插件配置时遇到错误，请根据
+	echo 配置文件里的说明检查配置。
 	echo 1>nul
 	echo 1>nul
 	echo 按任意键退出脚本
@@ -525,13 +574,141 @@ goto eof
 
 @rem Close the process which occupied the prot 5037
 @rem
-@rem param_3 processName The Process name 
 @rem return boolean If success that return true,otherwise return false
+@rem param_3 processName The Process name 
 :close5037ProcessByName
 	set result=false
 	taskkill /f /im %~n3 1>nul 2>nul
 	if %errorlevel%==0 set result=true
 	set %~1=!result!
+goto eof
+
+@rem Initalization config of plugin in path .\opt\plugin_config.txt
+@rem 
+@rem return boolean If initialize config success that return true,otherwise return false
+:initPluginConfig
+	set result=true
+	@rem 判断配置文件是否存在，不存在则新建一个,新的配置文件没有使用说明
+	if not exist ".\opt\plugin_config.txt" call %~n0 void createNewPluginConfigFile
+	echo 读取插件配置文件 .\opt\plugin_config.txt 中。。。
+	for /f "eol=#" %%t in (.\opt\plugin_config.txt) do (
+		@rem 从配置文件读取到的内容
+		set tmp_string_1=%%~t
+		@rem 生命周期
+		set tmp_string_2=null
+		if "%tmp_string_1:~0,1%"==":" (
+			@rem 解析到生命周期
+			set result=false
+			set tmp_string_2=%tmp_string_1:~1%
+			echo 解析到生命周期 !tmp_string_2!
+			if "!tmp_string_2!"=="onScriptFirstStart" set result=true
+			if "!tmp_string_2!"=="onCoreStart" set result=true
+			if "!tmp_string_2!"=="onBeforeInstallingApp" set result=true
+			if "!tmp_string_2!"=="onAfterInstallingApp" set result=true
+			if "!tmp_string_2!"=="onInstallAppCompleted" set result=true
+			if "!tmp_string_2!"=="onBeforePushingFile" set result=true
+			if "!tmp_string_2!"=="onAfterPushingFile" set result=true
+			if "!tmp_string_2!"=="onCoreFinish" set result=true
+			if "!result!"=="false" (
+				echo 错误的生命周期 !tmp_string_2! ，脚本将停止解析插件配置文件并退出
+				pause 1>nul
+				goto initPluginConfig_b_1
+			)
+		) else (
+			if "%tmp_string_1%" neq "" (
+				@rem 解析到插件名
+				if "!tmp_string_2!" neq "null" (
+					if exist ".\opt\!tmp_string_1!" (
+						call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+					) else (
+						set tmp_boolean_1=false
+						if exist ".\opt\!tmp_string_1!.bat" (
+							call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+							set tmp_boolean_1=true
+						)
+						if exist ".\opt\!tmp_string_1!.Bat" (
+							call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+							set tmp_boolean_1=true
+						)
+						if exist ".\opt\!tmp_string_1!.bAt" (
+							call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+							set tmp_boolean_1=true
+						)
+						if exist ".\opt\!tmp_string_1!.baT" (
+							call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+							set tmp_boolean_1=true
+						)
+						if exist ".\opt\!tmp_string_1!.BAt" (
+							call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+							set tmp_boolean_1=true
+						)
+						if exist ".\opt\!tmp_string_1!.BaT" (
+							call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+							set tmp_boolean_1=true
+						)
+						if exist ".\opt\!tmp_string_1!.bAT" (
+							call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+							set tmp_boolean_1=true
+						)
+						if exist ".\opt\!tmp_string_1!.BAT" (
+							call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
+							set tmp_boolean_1=true
+						)
+						if "!tmp_boolean_1!"=="false" (
+							echo 找不到插件文件 !tmp_string_1! ,该插件将不会被注册到 ”!tmp_string_2!“ 生命周期里
+						)
+					)
+				) else (
+					set result=false
+					echo 检测到 !tmp_string_1! 插件未在生命周期里注册，脚本将停止解析插件配置文件并退出
+					pause 1>nul
+					goto initPluginConfig_b_1
+				)
+			) else (
+				set result=false
+				echo 检测 "!tmp_string_1!" 行开头存在空格，脚本将停止解析插件配置文件并退出
+				pause 1>nul
+				goto initPluginConfig_b_1
+			)
+		)
+	)
+	:initPluginConfig_b_1
+	set %~1=!result!
+goto eof
+
+@rem Regist plugin to target script life cycle
+@rem
+@rem return void
+@rem param_3 string Life cycle name
+@rem param_4 string Plugin name
+:registPlugin
+	echo 在生命周期 ”%~n3“ 注册插件 %~n4
+	if "lifeCycle_%~n3" neq "null" (
+		set lifeCycle_%~n3=!lifeCycle_%~n3!,"%~n4"
+	) else (
+		set lifeCycle_%~n3="%~n4"
+	)
+goto eof
+
+@rem Create new plugin config file at .\opt 
+@rem
+@rem return void
+:createNewPluginConfigFile
+	echo #	This is new config file without document >.\opt\plugin_config.txt
+goto eof
+
+@rem Execute plugin on life cycle
+@rem 
+@rem return void
+@rem param_3 string Life cycle name
+@rem param_4 string Device serial
+@rem param_5 Applicathion or file absolute path 
+:executeLifeCycle
+	if "!lifeCycle_%~n3!" neq "null" (
+		for %%t in (!lifeCycle_%~n3!) do (
+			call .\opt\%%t void opt "%~n3" "%~n4" "%~5"
+		)
+	)
 goto eof
 
 @rem Calculate difference between old serial array and new serial array
@@ -647,18 +824,18 @@ goto eof
 	title [%~3] --- script_running
 	call %~n0 void setDeviceOptSatu %~3 script_running
 	echo ---------- 设备：%~3 ----------
-	call %~n0 boolean applicationOperation %~3
-	if "!boolean!"=="false" goto faild
+	call %~n0 void executeLifeCycle "onCoreStart" "%~n3"
 	echo -------------------------------
 	call %~n0 boolean installApp %~3
 	if "!boolean!"=="false" goto faild
 	echo -------------------------------
-	@rem call %~n0 boolean pushFiles %~3
-	@rem if "!boolean!"=="false" goto faild
-	@rem echo -------------------------------
-	@rem call %~n0 boolean applicationOperation %~3
-	@rem if "!boolean!"=="false" goto faild
-	@rem echo -------------------------------
+	call %~n0 void executeLifeCycle "onInstallAppCompleted" "%~n3"
+	echo -------------------------------
+	call %~n0 boolean pushFiles %~3
+	if "!boolean!"=="false" goto faild
+	echo -------------------------------
+	call %~n0 void executeLifeCycle "onCoreFinish" "%~n3"
+	echo -------------------------------
 	call %~n0 void openSettingActivity %~3
 	echo -------------------------------
 	title [%~3] --- complete
@@ -685,11 +862,13 @@ goto eof
 	echo 准备开始安装应用。。。。
 	adb.exe -s %~3 shell rm /data/local/tmp/*
 	for %%t in (.\app\*.apk) do (
+		call %~n0 void executeLifeCycle "onBeforeInstallingApp" "%~n3" "%~dp0app\%%~nxt"
 		set /a tmp_int_3= !tmp_int_3! + 1
 		adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
 		@rem start /min %~n0 void installApp_t_1 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt" "/sdcard/%%~nxt"
 		@rem start /min %~n0 void installApp_t_2 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt"
 		adb.exe -s %~3 shell pm install /sdcard/%%~nxt
+		call %~n0 void executeLifeCycle "onAfterInstallingApp" "%~n3" "%~dp0app\%%~nxt"
 		echo 第 !tmp_int_3! 个应用 %%~nxt 安装完成
 	)
 	@rem :installApp_l_1
@@ -747,6 +926,7 @@ goto eof
 	set result=true
 	set tmp_int_1=0
 	for %%t in (.\files\*) do (
+		call %~n0 void executeLifeCycle "onBeforePushingFile" "%~n3" "%~dp0files\%%~nxt"
 		set /a tmp_int_1= !tmp_int_1! + 1
 		echo 正在推送第 !tmp_int_1! 个文件：
 		echo %%~t
@@ -756,12 +936,16 @@ goto eof
 			set result=false
 			goto pushFiles_b_1
 		)
+		call %~n0 void executeLifeCycle "onAfterPushingFile" "%~n3" "%~dp0files\%%~nxt"
 		echo %%~t 推送完成
 	)
 	:pushFiles_b_1
 	set %~1=!result!
 goto eof
 
+@rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+@rem  这个方法废弃了，已经用生命周期机制代替
+@rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 @rem Applicathin operation for device by "input" command 
 @rem Usage: input [<source>] <command> [<arg>...]
 @rem 

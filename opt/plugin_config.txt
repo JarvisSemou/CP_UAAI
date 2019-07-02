@@ -1,0 +1,130 @@
+##########################################################################################
+#	当前文件是脚本的插件配置文件
+#
+#	文件版本：0.0.1
+#
+#	当前配置文件使用说明：
+#		1、"#" 开头的行是注释行，脚本不会解析注释行。“#” 一定要放在开头，否则解析会出错
+#		2、脚本的生命周期有这几个，分别会在这些生命周期里调用对应配置的插件：
+#				周期名字				周期调用时期及意义
+#			（1）onScriptFirstStart		在脚本初始化完成，且还没开始循环执行业务逻辑时被调用，只会执行一次
+#			（2）onCoreStart			在开始执行业务逻辑时被调用，对于每台设备只会执行一次
+#			（3）onBeforeInstallingApp	在开始安装一个应用前被调用，每迭代到 .\app 目录下的一个应用的时候就
+#										调用一次，对于每台设备一般会被多次调用
+#			（4）onAfterInstallingApp	在结束安装一个应用的安装时被调用，其调用频率与 onAfterInstallingApp 一样，
+#										只是在当前应用安装完成后被调用，对于每台设备一般会多次调用
+#			（5）onInstallAppCompleted	在结束安装业务逻辑后被调用，对于每台设备只会被调用一次，此生命周期通常用来准备
+#										推送文件业务逻辑
+#			（6）onBeforePushingFile	在开始推送一个文件时被调用，每迭代到 .\files 目录下的一个文件的时候
+#										就调用一次，对于每台设备一般会被多次调用
+#			（7）onAfterPushingFile		在结束推送一个文件的推送时被调用，其调用频率与 onBeforeInstallingApp 一样，
+#										只是在当前文件推送完成后被调用，对于每台设备一般会多次调用
+#			（8）onCoreFinish			在业务逻辑执行完成时被调用，对于每台设备只会执行一次
+#		3、脚本在调用插件时，目前传两个参数，第一个参数（param_3，通过 “%~n3” 引用）是当前生命周期的名字，例如“onScriptFirstStart”;
+#			第二个参数（param_4，通过 “%~n4” 引用）是当前设备的序列号。对于”onBeforeInstallingApp“、
+#			”onAfterInstallingApp“两个生命周期，还会传入第三个参数（param_5，通过 ”%~n5“ 引用），该参数是当前安装的应用
+#			的绝对路径；对于”onBeforePushingFile“、”onAfterPushingFile“两个生命周期，也会传入第三个参数（param_5，通过
+#			”%~n5“引用），该参数是当前推送的文件的绝对路径。对于 "onScriptFirstStart" 生命周期只传第一参数。
+#		4、当前配置文件的规则：
+#			（1）以 “:” 开头，后面紧跟生命周期的名字，表示准备注册在之后的行中出现的插件，让插件在当前生命周期被调用，
+#					例如：“:onScriptFirstStart”、”:onCoreFinish“
+#			（2）不以 ”:“ 开头的是插件文件的名字，表示要在对应生命周期被调用的插件，插件名只能由英文字母和阿拉伯数字
+#					组成，文件名不能有空格，且必须包含 ”.bat“ 后缀，例如：”PushMyFile.bat“、”UnInstallVPN.bat“。插件名后
+#					可以用 ”#“ 写注释
+#			（3）插件注册的顺序影响调用的顺序，先注册的先调用
+#			（4）一行只注册一个插件，空行不会被解析
+#			（5）生命周期名和插件名前都没有空格
+#		5、不符合上述说明的配置方法都可能导致配置文件解析出错
+#
+#	当前配置文件的使用例子：
+#		|# 配置脚本首次启动时的插件
+#		|:onScriptFirstStart
+#		|CleanCache.bat			#用于脚本首次启动时清除缓存目录
+#		|
+#		|:onCoreStart
+#		|UninstallVPN.bat		#在安装新版 VPN 客户端前卸载旧版 VPN
+#		|UninstallClockAPP.bat	#在开始安装程序前，先卸载时钟程序
+#		|
+#		|:onBeforeInstallingApp
+#		|Log.bat				#在开始安装一个应用前打印一个日志
+#		|
+#		|:onAfterInstallingApp
+#		|Log.bat				#在安装完一个应用后打印一个日志
+#		|
+#		|:onInstallAppCompleted
+#		|InstallClockAPP.bat	#安装业务逻辑结束后，重新安装时钟程序
+#		|DeleteCert.bat			#在开始推送文件前删除指定目录下的证书文件
+#		|Log.bat				#打印一个日志
+#		|
+#		|:onCoreFinish
+#		|ConfigVPN.bat			#业务逻辑完成后，用模拟触屏插件配置 VPN
+#		|RebootDevice.bat		#配置好 VPN 后，重启设备
+#
+#	插件编写模板
+#		@echo off
+#		@rem 描述插件用途
+#		if "%~n2"=="" ( 
+#			setlocal enabledelayedexpansion
+#			goto opt
+#		)
+#		if "%~n2"=="opt" goto opt
+#		goto eof
+#		
+#		@rem return void
+#		@rem param_3 序列号
+#		@rem param_4 周期名字
+#		:opt 
+#			@rem 这里开始写正式插件代码
+#
+#
+#			@rem 插件代码结束
+#		goto eof
+#
+#		:eof
+##########################################################################################
+
+
+#脚本首次启动
+:onScriptFirstStart
+
+
+
+
+#业务逻辑启动
+:onCoreStart
+
+
+
+
+#开始安装一个应用
+:onBeforeInstallingApp
+
+
+
+
+#一个应用安装完成
+:onAfterInstallingApp
+
+
+
+
+#安装业务逻辑完成
+:onInstallAppCompleted
+
+
+
+
+#开始推送一个文件
+:onBeforePushingFile
+
+
+
+
+#一个文件推送完成
+:onAfterPushingFile
+
+
+
+
+#业务逻辑执行完毕
+:onCoreFinish
