@@ -521,15 +521,8 @@ goto eof
 @rem 
 @rem return boolean if the path is not have blackspace that will return true,otherwise return false
 :isPathLegitimate
-	@rem @call %~f0 boolean isPathLegitimate 1>nul 2>nul
-	@rem set %1=true
-	@rem if %errorlevel% geq 1 (
-	@rem 	set _LogUtil=.\core\lib\LogUtil.bat
-	@rem 	call !_LogUtil! void log %~n0 "Applicathin path:^"%~f0^" contain blackspace,application will not work."
-	@rem 	set %1=false
-	@rem )
-	set result=true
-	if not exist %~f0 set result=false
+	set result=false
+	if exist %~f0 set result=true
 	set %~1=!result!
 goto eof
 
