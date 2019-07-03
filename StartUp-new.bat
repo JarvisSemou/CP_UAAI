@@ -88,6 +88,8 @@ if "%~2"=="" (
 	@rem 	goto installApp_t_2
 	@rem )
 	if "%~2"=="pushFiles" goto pushFiles
+	if "%~2"=="lockScreenDirection" goto lockScreenDirection
+	if "%~2"=="unlockScreenDirection" goto unlockScreenDirection
 	if "%~2"=="openSettingActivity" goto openSettingActivity
 	if "%~2"=="faild" goto faild
 	if "%~2"=="showDefaultPage" goto showDefaultPage
@@ -487,7 +489,7 @@ goto eof
 	cls
 	echo ==================================================================================
 	echo 启动脚本时无法启动 adb 程序服务，原因为 adb 程序的 5037 端口正被 “%~n3” 进程占用且
-	echo 脚本尝试 3 此关闭该进程都未成功，请手动关闭该进程后再启动脚本。
+	echo 脚本尝试 3 次关闭该进程都未成功，请手动关闭该进程后再启动脚本。
 	echo 1>nul
 	echo 注：该类进程一般为 “XX手机管家”、“XX手机助手”、“XX手机清理大师”等流氓软件，可以直接
 	echo 	它们的菜单中将他们关闭。
@@ -531,8 +533,8 @@ goto eof
 @rem return boolean If port 5037 Occupied that return true,otherwise return false  
 :is5037Occupied
 	set result=false
-	netstat -ano|findstr 5037 1>nul
-	if %errorlevel% gtr 0 set result=true
+	netstat -ano|findstr 127.0.0.1:5037 1>nul
+	if "%errorlevel%"=="0" set result=true
 	set %~1=!result!
 goto eof
 
@@ -542,11 +544,15 @@ goto eof
 :get5037ProcessName
 	set result=null
 	set tmp_int_1=0
-	for /f "tokens=5" %%i in ('netstat -ano^|findstr 5037') do (
-		for /f "usebackq" %%n in (`tasklist /nh /fi "pid eq %%i"`) do (
-			set result=%%n
+	for /f "tokens=4,5" %%i in ('netstat -ano^|findstr 127.0.0.1:5037') do (
+		for /f "usebackq" %%n in (`tasklist /nh /fi "pid eq %%j"`) do (
+			if "%%i"=="LISTENING" (
+				set result=%%n
+				goto get5037ProcessName_b_1
+			)
 		)
 	)
+	:get5037ProcessName_b_1
 	set %~1=!result!
 goto eof
 
@@ -584,15 +590,18 @@ goto eof
 	@rem 判断配置文件是否存在，不存在则新建一个,新的配置文件没有使用说明
 	if not exist ".\opt\plugin_config.txt" call %~n0 void createNewPluginConfigFile
 	echo 读取插件配置文件 .\opt\plugin_config.txt 中。。。
+	@rem 从配置文件读取到的内容
+	set tmp_string_1=null
+	@rem 生命周期
+	set tmp_string_2=null
 	for /f "eol=#" %%t in (.\opt\plugin_config.txt) do (
 		@rem 从配置文件读取到的内容
 		set tmp_string_1=%%~t
-		@rem 生命周期
-		set tmp_string_2=null
-		if "%tmp_string_1:~0,1%"==":" (
+		set tmp_string_3=!tmp_string_1:~0,1!
+		if "!tmp_string_3!"==":" (
 			@rem 解析到生命周期
 			set result=false
-			set tmp_string_2=%tmp_string_1:~1%
+			set tmp_string_2=!tmp_string_1:~1!
 			echo 解析到生命周期 !tmp_string_2!
 			if "!tmp_string_2!"=="onScriptFirstStart" set result=true
 			if "!tmp_string_2!"=="onCoreStart" set result=true
@@ -608,7 +617,7 @@ goto eof
 				goto initPluginConfig_b_1
 			)
 		) else (
-			if "%tmp_string_1%" neq "" (
+			if "!tmp_string_1!" neq "" (
 				@rem 解析到插件名
 				if "!tmp_string_2!" neq "null" (
 					if exist ".\opt\!tmp_string_1!" (
@@ -676,7 +685,7 @@ goto eof
 @rem param_4 string Plugin name
 :registPlugin
 	echo 在生命周期 ”%~n3“ 注册插件 %~n4
-	if "lifeCycle_%~n3" neq "null" (
+	if "!lifeCycle_%~n3!" neq "null" (
 		set lifeCycle_%~n3=!lifeCycle_%~n3!,"%~n4"
 	) else (
 		set lifeCycle_%~n3="%~n4"
@@ -860,7 +869,7 @@ goto eof
 		adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
 		@rem start /min %~n0 void installApp_t_1 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt" "/sdcard/%%~nxt"
 		@rem start /min %~n0 void installApp_t_2 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt"
-		adb.exe -s %~3 shell pm install /sdcard/%%~nxt
+		adb.exe -s %~3 shell pm install -r /sdcard/%%~nxt
 		call %~n0 void executeLifeCycle "onAfterInstallingApp" "%~n3" "%~dp0app\%%~nxt"
 		echo 第 !tmp_int_3! 个应用 %%~nxt 安装完成
 	)
@@ -982,6 +991,23 @@ goto eof
 	)
 	:applicationOperation_b_1
 	set %~1=!result!
+goto eof
+
+@rem Lock screen direction
+@rem
+@rem return void
+@rem param_3 string Device serial
+:lockScreenDirection
+	adb.exe -s %~n3 shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
+	adb.exe -s %~n3 shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0
+goto eof
+
+@rem Unlock screen direction
+@rem
+@rem return void
+@rem param_3 string Device serial
+:unlockScreenDirection
+	adb.exe -s %~3 shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
 goto eof
 
 @rem Open setting activity
