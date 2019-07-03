@@ -524,7 +524,7 @@ goto eof
 @rem return boolean if the path is not have blackspace that will return true,otherwise return false
 :isPathLegitimate
 	set result=false
-	if exist %~f0 set result=true
+	if exist %~f0 set result=true 2>nul
 	set %~1=!result!
 goto eof
 
