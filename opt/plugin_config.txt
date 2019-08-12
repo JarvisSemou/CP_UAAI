@@ -71,8 +71,8 @@
 #		goto eof
 #		
 #		@rem return void
-#		@rem param_3 序列号
-#		@rem param_4 周期名字
+#		@rem param_3 周期名字
+#		@rem param_4 序列号
 #		:opt 
 #			@rem 这里开始写正式插件代码
 #
