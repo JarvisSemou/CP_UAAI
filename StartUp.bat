@@ -44,7 +44,7 @@
 @rem and win xp system.It will call 1.0.39 version adb tool for  win 10,win 8,win 7,
 @rem ,and call 1.0.31 version adb tool for win vista and win xp system.
 
-@rem win 10		10.0*
+@rem 	win 10		10.0*
 @rem	win 8		6.[23]*
 @rem	win 7		6.1.*
 @rem	win vista	6.0
@@ -56,139 +56,148 @@ if "%~2"=="" (
 	goto initStaticValue
 )
 :methodBrach
-if "%~2"=="" goto main
-if "%~2"=="isPathLegitimate" goto isPathLegitimate
-if "%~2"=="printNostartAdbPage_1" goto printNostartAdbPage_1
-if "%~2"=="printNostartAdbPage_2" goto printNostartAdbPage_2
-if "%~2"=="printInitPluginConfigErrPage" goto printInitPluginConfigErrPage
-if "%~2"=="is5037Occupied" goto is5037Occupied
-if "%~2"=="get5037ProcessName" goto get5037ProcessName
-if "%~2"=="restartAdb" goto restartAdb
-if "%~2"=="close5037ProcessByName" goto close5037ProcessByName
-if "%~2"=="initPluginConfig" goto initPluginConfig
-if "%~2"=="registPlugin" goto registPlugin
-if "%~2"=="createNewPluginConfigFile" goto createNewPluginConfigFile
-if "%~2"=="executeLifeCycle" goto executeLifeCycle
-if "%~2"=="setDeviceOptSatu" goto setDeviceOptSatu
-if "%~2"=="getDeviceOptSatu" goto getDeviceOptSatu
-if "%~2"=="getSatuMappedName" goto getSatuMappedName
-if "%~2"=="coreEntry" (
-	setlocal enableDelayedExpansion
-	goto coreEntry
-)
-if "%~2"=="installApp" goto installApp
-if "%~2"=="pushFiles" goto pushFiles
-if "%~2"=="applicationOperation" goto applicationOperation
-if "%~2"=="openSettingActivity" goto openSettingActivity
-if "%~2"=="faild" goto faild
+	if "%~2"=="" goto main
+	if "%~2"=="isPathLegitimate" goto isPathLegitimate
+	if "%~2"=="printNostartAdbPage_1" goto printNostartAdbPage_1
+	if "%~2"=="printNostartAdbPage_2" goto printNostartAdbPage_2
+	if "%~2"=="printInitPluginConfigErrPage" goto printInitPluginConfigErrPage
+	if "%~2"=="is5037Occupied" goto is5037Occupied
+	if "%~2"=="get5037ProcessName" goto get5037ProcessName
+	if "%~2"=="restartAdb" goto restartAdb
+	if "%~2"=="close5037ProcessByName" goto close5037ProcessByName
+	if "%~2"=="initPluginConfig" goto initPluginConfig
+	if "%~2"=="registPlugin" goto registPlugin
+	if "%~2"=="createNewPluginConfigFile" goto createNewPluginConfigFile
+	if "%~2"=="executeLifeCycle" goto executeLifeCycle
+	if "%~2"=="setDeviceOptSatu" goto setDeviceOptSatu
+	if "%~2"=="getDeviceOptSatu" goto getDeviceOptSatu
+	if "%~2"=="getSatuMappedName" goto getSatuMappedName
+	if "%~2"=="coreEntry" (
+		setlocal enableDelayedExpansion
+		goto coreEntry
+	)
+	if "%~2"=="installApp" goto installApp
+	if "%~2"=="pushFiles" goto pushFiles
+	if "%~2"=="lockScreenDirection" goto lockScreenDirection
+	if "%~2"=="unlockScreenDirection" goto unlockScreenDirection
+	if "%~2"=="openSettingActivity" goto openSettingActivity
+	if "%~2"=="faild" goto faild
 goto eof
 
 :initStaticValue
-@rem 当前工作根路径
-set rootPath=%~dp0
-set path=%rootpath%bin;!path!
-set tmpdir=%temp%\tmpdir
-set listtmp=%tmpdir%\list
-@rem onScriptFirstStart 生命周期的插件调用链
-set lifeCycle_onScriptFirstStart=null
-@rem onCoreStart 生命周期的插件调用链
-set lifeCycle_onCoreStart=null
-@rem onBeforeInstallingApp 生命周期的插件调用链
-set lifeCycle_onBeforeInstallingApp=null
-@rem onAfterInstallingApp 生命周期的插件调用链
-set lifeCycle_onAfterInstallingApp=null
-@rem onInstallAppCompleted 生命轴承的插件调用链
-set lifeCycle_onInstallAppCompleted=null
-@rem onBeforePushingFile 生命周期的插件调用链
-set lifeCycle_onBeforePushingFile=null
-@rem onAfterPushingFile 生命周期的插件调用链
-set lifeCycle_onAfterPushingFile=null
-@rem onCoreFinish 生命周期的插件调用链
-set lifeCycle_onCoreFinish=null
-goto methodBrach
+	@rem 当前工作根路径
+	set rootPath=%~dp0
+	set path=%rootpath%bin;!path!
+	set tmpdir=%temp%\tmpdir
+	set listtmp=%tmpdir%\list
+	@rem onScriptFirstStart 生命周期的插件调用链
+	set lifeCycle_onScriptFirstStart=null
+	@rem onCoreStart 生命周期的插件调用链
+	set lifeCycle_onCoreStart=null
+	@rem onStartInstallApp 生命周期的插件调用链
+	set lifeCycle_onStartInstallApp=null
+	@rem onBeforeInstallingApp 生命周期的插件调用链
+	set lifeCycle_onBeforeInstallingApp=null
+	@rem onAfterInstallingApp 生命周期的插件调用链
+	set lifeCycle_onAfterInstallingApp=null
+	@rem onInstallAppCompleted 生命轴承的插件调用链
+	set lifeCycle_onInstallAppCompleted=null
+	@rem onStartPushFile 生命周期的插件调用链
+	set lifeCycle_onStartPushFile=null
+	@rem onBeforePushingFile 生命周期的插件调用链
+	set lifeCycle_onBeforePushingFile=null
+	@rem onAfterPushingFile 生命周期的插件调用链
+	set lifeCycle_onAfterPushingFile=null
+	@rem onPushFileCompleted 生命周期的插件调用链
+	set lifeCycle_onPushFileCompleted=null
+	@rem onCoreLogicFinish 生命周期的插件调用链
+	set lifeCycle_onCoreLogicFinish=null
+	@rem onCoreFinish 生命周期的插件调用链
+	set lifeCycle_onCoreFinish=null
+	goto methodBrach
 goto eof
 
 :main
-title CP_UAAI  ---  Mouse.JiangWei     :-D
-echo [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[@
-echo                                                                                      @
-echo                                                                                      @
-echo                                                                                      @
-echo                                                                                      @
-echo                                                                                      @
-echo         ]@@@@@`  @@@@@\]`           ,@@@     /@@.     =@@@`        .@@@\      @@@    @
-echo      ,@@@@@@@@@  @@@@@@@@@^^         =@@@     @@@.    ,@@@@@        /@@@@^^     @@@    @
-echo     =@@@.        @@@   =@@@         =@@@     @@@.   .@@@=@@^^      =@@^^@@@.    @@@    @
-echo     @@@^^         @@@  ,@@@/         =@@@     @@@.   /@@` @@@`    ,@@/ =@@\    @@@    @
-echo     @@@^^         @@@@@@@/`          ,@@@     @@@.  =@@\]]/@@@.  .@@@]]]/@@^^   @@@    @
-echo     =@@@`     .  @@@                 @@@^^   ,@@@  ,@@@@@@@@@@\  /@@@@@@@@@@`  @@@    @
-echo      ,@@@@@@@@@  @@@                 ,@@@@@@@@@.  @@@`     @@@^^=@@@     =@@@  @@@    @
-echo         .[[[[.   **,                    ,[[[`    ,**`      .`*`,*,.      ,*,. **,    @
-echo                                                                                      @
-echo                            \@@@@@@@^^                                                 @
-echo                                                                                      @
-echo                                                                                      @
-echo                                                                                      @
-echo                                                             Mouse.JiangWei           @
-echo                                                                                      @
-echo                                                                                      @
-echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-echo 脚本启动中。。。
-cd /d %rootPath%
-@rem 检测路径是否包含空格
-call %~n0 boolean isPathLegitimate
-if "!boolean!"=="false" (
-	echo 当前路径 “%~dp0” 包含空格，请将此脚本应用放到无空格的路径中再运行
-	echo 1>nul
-	echo 1>nul
-	echo 1>nul
-	echo 1>nul
-	echo 1>nul
-	echo 1>nul
-	echo 按任意键退出
-	pause 1>nul
-	goto eof
-)
-@rem 判断当前占用 5037 端口的进程
-echo 检查 5037 端口。。。
-call %~n0 boolean is5037Occupied
-if "!boolean!"=="true" (
-	call %~n0 string get5037ProcessName
-	if "!string!"=="adb.exe" (
-		@rem adb 进程正在占用 5037 端口,尝试 3 次使用当前脚本的 adb 程序
-		call %~n0 boolean restartAdb
-		if "!boolean!"=="false" call %~n0 boolean restartAdb
-		if "!boolean!"=="false" call %~n0 boolean restartAdb
-		if "!boolean!"=="false" (
-			call %~n0 void printNostartAdbPage_1
-			goto eof
-		)
-	) else (
-		@rem 非 adb 进程在占用 5037 端口，先尝试 3 此关闭占用 5037 端口的进程，如果失败则建议手动关闭相应进程
-		call %~n0 boolean close5037ProcessByName "!string!"
-		if "!boolean!"=="false" call %~n0 boolean close5037ProcessByName "!string!"
-		if "!boolean!"=="false" call %~n0 boolean close5037ProcessByName "!string!"
-		if "!boolean!"=="false" (
-			call %~n0 void printNostartAdbPage_2 "!string!"
-			goto eof
+	title CP_UAAI  ---  Mouse.JiangWei     :-D
+	echo [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[@
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo         ]@@@@@`  @@@@@\]`           ,@@@     /@@.     =@@@`        .@@@\      @@@    @
+	echo      ,@@@@@@@@@  @@@@@@@@@^^         =@@@     @@@.    ,@@@@@        /@@@@^^     @@@    @
+	echo     =@@@.        @@@   =@@@         =@@@     @@@.   .@@@=@@^^      =@@^^@@@.    @@@    @
+	echo     @@@^^         @@@  ,@@@/         =@@@     @@@.   /@@` @@@`    ,@@/ =@@\    @@@    @
+	echo     @@@^^         @@@@@@@/`          ,@@@     @@@.  =@@\]]/@@@.  .@@@]]]/@@^^   @@@    @
+	echo     =@@@`     .  @@@                 @@@^^   ,@@@  ,@@@@@@@@@@\  /@@@@@@@@@@`  @@@    @
+	echo      ,@@@@@@@@@  @@@                 ,@@@@@@@@@.  @@@`     @@@^^=@@@     =@@@  @@@    @
+	echo         .[[[[.   **,                    ,[[[`    ,**`      .`*`,*,.      ,*,. **,    @
+	echo                                                                                      @
+	echo                            \@@@@@@@^^                                                 @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo                                                             Mouse.JiangWei           @
+	echo                                                                                      @
+	echo                                                                                      @
+	echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	echo 脚本启动中。。。
+	cd /d %rootPath%
+	@rem 检测路径是否包含空格
+	call %~n0 boolean isPathLegitimate
+	if "!boolean!"=="false" (
+		echo 当前路径 “%~dp0” 包含空格，请将此脚本应用放到无空格的路径中再运行
+		echo 1>nul
+		echo 1>nul
+		echo 1>nul
+		echo 1>nul
+		echo 1>nul
+		echo 1>nul
+		echo 按任意键退出
+		pause 1>nul
+		goto eof
+	)
+	@rem 判断当前占用 5037 端口的进程
+	echo 检查 5037 端口。。。
+	call %~n0 boolean is5037Occupied
+	if "!boolean!"=="true" (
+		call %~n0 string get5037ProcessName
+		if "!string!"=="adb.exe" (
+			@rem adb 进程正在占用 5037 端口,尝试 3 次使用当前脚本的 adb 程序
+			call %~n0 boolean restartAdb
+			if "!boolean!"=="false" call %~n0 boolean restartAdb
+			if "!boolean!"=="false" call %~n0 boolean restartAdb
+			if "!boolean!"=="false" (
+				call %~n0 void printNostartAdbPage_1
+				goto eof
+			)
+		) else (
+			@rem 非 adb 进程在占用 5037 端口，先尝试 3 此关闭占用 5037 端口的进程，如果失败则建议手动关闭相应进程
+			call %~n0 boolean close5037ProcessByName "!string!"
+			if "!boolean!"=="false" call %~n0 boolean close5037ProcessByName "!string!"
+			if "!boolean!"=="false" call %~n0 boolean close5037ProcessByName "!string!"
+			if "!boolean!"=="false" (
+				call %~n0 void printNostartAdbPage_2 "!string!"
+				goto eof
+			)
 		)
 	)
-)
-if exist "%tmpdir%" rd /s /q "%tmpdir%" >nul
-mkdir %tmpdir%
-mkdir %listtmp%
-@rem 初始化插件配置
-call %~n0 boolean initPluginConfig
-if "!boolean!"=="false" (
-	call %~n0 void printInitPluginConfigErrPage
-	goto eof
-)
-call %~n0 void executeLifeCycle "onScriptFirstStart" 
-@rem 当前正在处理的设备的序列号列表
-set array_processing_serial=null
-@rem 当前连接到电脑的设备序列号列表（无视状态）
-set array_devices_serial=null
-:main_loop_1
+	if exist "%tmpdir%" rd /s /q "%tmpdir%" >nul
+	mkdir %tmpdir%
+	mkdir %listtmp%
+	@rem 初始化插件配置
+	call %~n0 boolean initPluginConfig
+	if "!boolean!"=="false" (
+		call %~n0 void printInitPluginConfigErrPage
+		goto eof
+	)
+	call %~n0 void executeLifeCycle "onScriptFirstStart" 
+	@rem 当前正在处理的设备的序列号列表
+	set array_processing_serial=null
+	@rem 当前连接到电脑的设备序列号列表（无视状态）
+	set array_devices_serial=null
+	:main_loop_1
 	@rem 每秒刷新连接设备列表
 	cls
 	echo ----------------------------- 当前连接状态 -----------------------------
@@ -249,7 +258,7 @@ set array_devices_serial=null
 	)
 	@rem 等待一秒
 	choice /d y /t 1 /n 1>nul
-goto main_loop_1
+	goto main_loop_1
 goto eof
 
 @rem Print no start adb page 1
@@ -351,15 +360,15 @@ goto eof
 @rem 
 @rem return boolean If restart adb.exe success that will return true,otherwise return false
 :restartAdb
-set result=true
-@rem 强行关闭多余的 adb 
-taskkill /f /im adb.exe 1>nul 2>nul
-@rem 重新开启 adb 服务
-adb.exe start-server 1>nul 2>nul
-if %errorlevel% geq 1 (
-	set result=false
-)
-set %~1=!result!
+	set result=true
+	@rem 强行关闭多余的 adb 
+	taskkill /f /im adb.exe 1>nul 2>nul
+	@rem 重新开启 adb 服务
+	adb.exe start-server 1>nul 2>nul
+	if %errorlevel% geq 1 (
+		set result=false
+	)
+	set %~1=!result!
 goto eof
 
 @rem Close the process which occupied the prot 5037
@@ -396,11 +405,15 @@ goto eof
 			echo 解析到生命周期 !tmp_string_2!
 			if "!tmp_string_2!"=="onScriptFirstStart" set result=true
 			if "!tmp_string_2!"=="onCoreStart" set result=true
+			if "!tmp_string_2!"=="onStartInstallApp" set result=true
 			if "!tmp_string_2!"=="onBeforeInstallingApp" set result=true
 			if "!tmp_string_2!"=="onAfterInstallingApp" set result=true
 			if "!tmp_string_2!"=="onInstallAppCompleted" set result=true
+			if "!tmp_string_2!"=="onStartPushFile" set result=true
 			if "!tmp_string_2!"=="onBeforePushingFile" set result=true
 			if "!tmp_string_2!"=="onAfterPushingFile" set result=true
+			if "!tmp_string_2!"=="onPushFileCompleted" set result=true
+			if "!tmp_string_2!"=="onCoreLogicFinish" set result=true
 			if "!tmp_string_2!"=="onCoreFinish" set result=true
 			if "!result!"=="false" (
 				echo 错误的生命周期 !tmp_string_2! ，脚本将停止解析插件配置文件并退出
@@ -492,14 +505,19 @@ goto eof
 
 @rem Execute plugin on life cycle
 @rem 
-@rem return void
+@rem return boolean Return false that no execute next life cycle,default is true
 @rem param_3 string Life cycle name
 @rem param_4 string Device serial
 @rem param_5 Applicathion or file absolute path 
 :executeLifeCycle
 	if "!lifeCycle_%~n3!" neq "null" (
 		for %%t in (!lifeCycle_%~n3!) do (
-			call .\opt\%%t void opt "%~n3" "%~n4" "%~5"
+			call .\opt\%%t boolean opt "%~n3" "%~n4" "%~5"
+			if "!boolean!"=="" (
+				set %~1=true
+			) else (
+				set %~1=!boolean!
+			)
 		)
 	)
 goto eof
@@ -517,7 +535,7 @@ goto eof
 @rem param_3 string Serial number
 @rem param_4 string Statu
 :setDeviceOptSatu
-echo %~4>%listtmp%\%~3
+	echo %~4>%listtmp%\%~3
 goto eof
 
 @rem Get device option satu
@@ -525,11 +543,11 @@ goto eof
 @rem return string Statu
 @rem param_3 string Serial number
 :getDeviceOptSatu
-set return=null
-if exist "%listtmp%\%~3" (
-	set /p result=<"%listtmp%\%~3"
-)
-set %~1=!result!
+	set return=null
+	if exist "%listtmp%\%~3" (
+		set /p result=<"%listtmp%\%~3"
+	)
+	set %~1=!result!
 goto eof
 
 @rem Get satu mapped name
@@ -537,39 +555,39 @@ goto eof
 @rem return string Mapped name
 @rem param_3 string statu
 :getSatuMappedName
-set result=null
-if "%~3" neq "" (
-	if "%~3"=="null" ( 
-		set result=正在获取状态。。。
-		goto getSatuMappedName_b_1
+	set result=null
+	if "%~3" neq "" (
+		if "%~3"=="null" ( 
+			set result=正在获取状态。。。
+			goto getSatuMappedName_b_1
+		)
+		if "%~3"=="unauthorized" ( 
+			set result=未验证
+			goto getSatuMappedName_b_1
+		)
+		if "%~3"=="device" (
+			set result=已连接
+			goto getSatuMappedName_b_1
+		)
+		if "%~3"=="offline" (
+			set result=已离线
+			goto getSatuMappedName_b_1
+		)
+		if "%~3"=="script_running" (
+			set result=脚本运行中
+			goto getSatuMappedName_b_1
+		)
+		if "%~3"=="complete" (
+			set result=完成
+			goto getSatuMappedName_b_1
+		)
+		if "%~3"=="faild" (
+			set result=失败
+			goto getSatuMappedName_b_1
+		)
 	)
-	if "%~3"=="unauthorized" ( 
-		set result=未验证
-		goto getSatuMappedName_b_1
-	)
-	if "%~3"=="device" (
-		set result=已连接
-		goto getSatuMappedName_b_1
-	)
-	if "%~3"=="offline" (
-		set result=已离线
-		goto getSatuMappedName_b_1
-	)
-	if "%~3"=="script_running" (
-		set result=脚本运行中
-		goto getSatuMappedName_b_1
-	)
-	if "%~3"=="complete" (
-		set result=完成
-		goto getSatuMappedName_b_1
-	)
-	if "%~3"=="faild" (
-		set result=失败
-		goto getSatuMappedName_b_1
-	)
-)
-:getSatuMappedName_b_1
-set %~1=!result!
+	:getSatuMappedName_b_1
+	set %~1=!result!
 goto eof
 
 @rem
@@ -579,17 +597,35 @@ goto eof
 	title [%~3] --- script_running
 	call %~n0 void setDeviceOptSatu %~3 script_running
 	echo ---------- 设备：%~3 ----------
-	call %~n0 void executeLifeCycle "onCoreStart" "%~n3"
+	call %~n0 boolean executeLifeCycle "onCoreStart" "%~n3"
 	echo -------------------------------
-	call %~n0 boolean installApp %~3
-	if "!boolean!"=="false" goto faild
+	if "!boolean!"=="true" (
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onStartInstallApp" "%~n3"
+		echo -------------------------------
+		if "!boolean!"=="true" (
+			call %~n0 boolean installApp %~3
+			if "!boolean!"=="false" goto faild
+			echo -------------------------------
+			call %~n0 boolean executeLifeCycle "onInstallAppCompleted" "%~n3"
+			echo -------------------------------
+		)
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onStartPushFile" "%~n3"
+		echo -------------------------------
+		if "!boolean!"=="true" (
+			call %~n0 boolean pushFiles %~3
+			if "!boolean!"=="false" goto faild
+			echo -------------------------------
+			call %~n0 boolean executeLifeCycle "onPushFileCompleted" "%~n3"
+			echo -------------------------------
+		)
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onCoreLogicFinish" "%~n3"
+		echo -------------------------------
+	)
 	echo -------------------------------
-	call %~n0 void executeLifeCycle "onInstallAppCompleted" "%~n3"
-	echo -------------------------------
-	call %~n0 boolean pushFiles %~3
-	if "!boolean!"=="false" goto faild
-	echo -------------------------------
-	call %~n0 void executeLifeCycle "onCoreFinish" "%~n3"
+	call %~n0 boolean executeLifeCycle "onCoreFinish" "%~n3"
 	echo -------------------------------
 	call %~n0 void openSettingActivity %~3
 	echo -------------------------------
@@ -605,95 +641,81 @@ goto eof
 @rem return boolean If success that will return true,otherwise return false 
 @rem param_3 string Device serial number
 :installApp
-set result=true
-set tmp_int_1=0
-for %%t in (.\app\*.apk) do (
-	call %~n0 void executeLifeCycle "onBeforeInstallingApp" "%~n3" "%~dp0app\%%~nxt"
-	set /a tmp_int_1= !tmp_int_1! + 1
-	echo 正在安装第 !tmp_int_1! 个应用：
-	echo %%~t
-	adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
-	adb.exe -s %~3 shell pm install -r /sdcard/%%~nxt
-	if %errorlevel% geq 1 (
-		echo %%~t 安装失败
-		set result=false
-		goto installApp_b_1
+	set result=true
+	set tmp_int_3=0
+	for %%t in (.\app\*.apk) do (
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onBeforeInstallingApp" "%~n3" "%~dp0app\%%~nxt"
+		echo -------------------------------
+		set /a tmp_int_3= !tmp_int_3! + 1
+		if "!boolean!"=="true" (
+			echo 正在安装第 !tmp_int_3! 个应用 %%~nxt 
+			adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
+			adb.exe -s %~3 shell pm install -r /sdcard/%%~nxt
+			if %errorlevel% geq 1 (
+				echo %%~t 安装失败
+				set result=false
+				goto installApp_b_1
+			)
+			echo -------------------------------
+			call %~n0 boolean executeLifeCycle "onAfterInstallingApp" "%~n3" "%~dp0app\%%~nxt"
+			echo -------------------------------
+			echo 第 !tmp_int_3! 个应用 %%~nxt 安装完成
+		) else (
+			echo 跳过第 !tmp_int_3! 个应用的安装
+		)
 	)
-	call %~n0 void executeLifeCycle "onAfterInstallingApp" "%~n3" "%~dp0app\%%~nxt"
-	echo %%~t 安装完成
-)
-:installApp_b_1
-set %~1=!result!
-:goto eof
+	:installApp_b_1
+	set %~1=!result!
+goto eof
 
 @rem Push files to the devices
 @rem
 @rem return boolean If success to push than return true,otherwise return false
 @rem param_3 string Device serial number
 :pushFiles
-set result=true
-set tmp_int_1=0
-for %%t in (.\files\*) do (
-	call %~n0 void executeLifeCycle "onBeforePushingFile" "%~n3" "%~dp0files\%%~nxt"
-	set /a tmp_int_1= !tmp_int_1! + 1
-	echo 正在推送第 !tmp_int_1! 个文件：
-	echo %%~t
-	adb.exe -s %~3 push "%%~t" /sdcard/%%~nxt
-	if %errorlevel% geq 1 (
-		echo %%~t 推送失败
-		set result=false
-		goto pushFiles_b_1
+	set result=true
+	set tmp_int_1=0
+	for %%t in (.\files\*) do (
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onBeforePushingFile" "%~n3" "%~dp0files\%%~nxt"
+		echo -------------------------------
+		set /a tmp_int_1= !tmp_int_1! + 1
+		if "!boolean!"=="true" (
+			echo 正在推送第 !tmp_int_1! 个文件：%%~t
+			adb.exe -s %~3 push "%%~t" /sdcard/%%~nxt
+			if %errorlevel% geq 1 (
+				echo %%~t 推送失败
+				set result=false
+				goto pushFiles_b_1
+			)
+			echo -------------------------------
+			call %~n0 boolean executeLifeCycle "onAfterPushingFile" "%~n3" "%~dp0files\%%~nxt"
+			echo -------------------------------
+			echo 第 !tmp_int_1! 个文件：%%~t 推送完成
+		) else (
+			echo 跳过第 !tmp_int_1! 个文件 ’%%~t‘ 的推送
+		)
 	)
-	call %~n0 void executeLifeCycle "onAfterPushingFile" "%~n3" "%~dp0files\%%~nxt"
-	echo %%~t 推送完成
-)
-:pushFiles_b_1
-set %~1=!result!
+	:pushFiles_b_1
+	set %~1=!result!
 goto eof
 
-@rem Applicathin operation for device by "input" command 
-@rem Usage: input [<source>] <command> [<arg>...]
-@rem 
-@rem The sources are:
-@rem       mouse
-@rem       keyboard
-@rem       joystick
-@rem       touchnavigation
-@rem       touchpad
-@rem       trackball
-@rem       stylus
-@rem       dpad
-@rem       touchscreen
-@rem       gamepad
-@rem 
-@rem The commands and default sources are:
-@rem       text <string> (Default: touchscreen)
-@rem       keyevent [--longpress] <key code number or name> ... (Default: keyboard)
-@rem       tap <x> <y> (Default: touchscreen)
-@rem       swipe <x1> <y1> <x2> <y2> [duration(ms)] (Default: touchscreen)
-@rem       press (Default: trackball)
-@rem       roll <dx> <dy> (Default: trackball)
+@rem Lock screen direction
 @rem
-@rem 
-@rem return boolean If success to excute operation file that return true,otherwise return false
-@rem param_3 string Device serial number
-:applicationOperation
-adb.exe -s %~3 shell am force-stop com.android.settings
-adb.exe -s %~3 shell input keyevent KEYCODE_WAKEUP
-adb.exe -s %~3 shell input touchscreen swipe 300 460 300 0 150
-set result=true
-for %%t in (.\opt\*.bat) do (
-	set tmp_string_1=%%~t
-	call %%~ft void opt %~3
-	if %errorlevel% geq 1 (
-		echo %%~t 动作执行失败
-		set result=false
-		goto applicationOperation_b_1
-	)
-	echo %%~t 动作执行完成
-)
-:applicationOperation_b_1
-set %~1=!result!
+@rem return void
+@rem param_3 string Device serial
+:lockScreenDirection
+	adb.exe -s %~n3 shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
+	adb.exe -s %~n3 shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0
+goto eof
+
+@rem Unlock screen direction
+@rem
+@rem return void
+@rem param_3 string Device serial
+:unlockScreenDirection
+	adb.exe -s %~3 shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
 goto eof
 
 @rem Open setting activity
@@ -701,33 +723,33 @@ goto eof
 @rem return void
 @rem param_3 string Device serial number
 :openSettingActivity
-adb.exe -s %~3 shell am force-stop com.android.settings
-adb.exe -s %~3 shell input keyevent KEYCODE_WAKEUP
-adb.exe -s %~3 shell input touchscreen swipe 300 460 300 0 150
-adb.exe -s %~3 shell am start -n com.android.settings/com.android.settings.Settings
+	adb.exe -s %~3 shell am force-stop com.android.settings
+	adb.exe -s %~3 shell input keyevent KEYCODE_WAKEUP
+	adb.exe -s %~3 shell input touchscreen swipe 300 460 300 0 150
+	adb.exe -s %~3 shell am start -n com.android.settings/com.android.settings.Settings
 goto eof
 
 @rem Script has error,than set consol mode
 @rem
 @rem return void
 :faild
-title [%~3] --- faild
-color 7f
-call %~n0 void setDeviceOptSatu %~3 faild
-echo -------------------------------
-echo 稍等脚本更新状态。。。
-echo 待屏幕恢复黑色，拔掉 USB 线几秒后再重新连接
-choice /d y /t 5 /n 1>nul
-call %~n0 void setDeviceOptSatu %~3 device
-color 0f
-goto close
+	title [%~3] --- faild
+	color 7f
+	call %~n0 void setDeviceOptSatu %~3 faild
+	echo -------------------------------
+	echo 稍等脚本更新状态。。。
+	echo 待屏幕恢复黑色，拔掉 USB 线几秒后再重新连接
+	choice /d y /t 5 /n 1>nul
+	call %~n0 void setDeviceOptSatu %~3 device
+	color 0f
+	goto close
 goto eof
 
 @rem Close consol
 @rem 
 @rem return void
 :close
-exit
+	exit
 goto eof
 
 :eof

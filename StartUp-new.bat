@@ -110,16 +110,24 @@ goto eof
 	set lifeCycle_onScriptFirstStart=null
 	@rem onCoreStart 生命周期的插件调用链
 	set lifeCycle_onCoreStart=null
+	@rem onStartInstallApp 生命周期的插件调用链
+	set lifeCycle_onStartInstallApp=null
 	@rem onBeforeInstallingApp 生命周期的插件调用链
 	set lifeCycle_onBeforeInstallingApp=null
 	@rem onAfterInstallingApp 生命周期的插件调用链
 	set lifeCycle_onAfterInstallingApp=null
 	@rem onInstallAppCompleted 生命轴承的插件调用链
 	set lifeCycle_onInstallAppCompleted=null
+	@rem onStartPushFile 生命周期的插件调用链
+	set lifeCycle_onStartPushFile=null
 	@rem onBeforePushingFile 生命周期的插件调用链
 	set lifeCycle_onBeforePushingFile=null
 	@rem onAfterPushingFile 生命周期的插件调用链
 	set lifeCycle_onAfterPushingFile=null
+	@rem onPushFileCompleted 生命周期的插件调用链
+	set lifeCycle_onPushFileCompleted=null
+	@rem onCoreLogicFinish 生命周期的插件调用链
+	set lifeCycle_onCoreLogicFinish=null
 	@rem onCoreFinish 生命周期的插件调用链
 	set lifeCycle_onCoreFinish=null
 	goto methodBrach
@@ -492,7 +500,7 @@ goto eof
 	echo 脚本尝试 3 次关闭该进程都未成功，请手动关闭该进程后再启动脚本。
 	echo 1>nul
 	echo 注：该类进程一般为 “XX手机管家”、“XX手机助手”、“XX手机清理大师”等流氓软件，可以直接
-	echo 	它们的菜单中将他们关闭。
+	echo 	在它们的菜单中将他们关闭。
 	echo 1>nul
 	echo 1>nul
 	echo 按任意键退出脚本
@@ -605,11 +613,15 @@ goto eof
 			echo 解析到生命周期 !tmp_string_2!
 			if "!tmp_string_2!"=="onScriptFirstStart" set result=true
 			if "!tmp_string_2!"=="onCoreStart" set result=true
+			if "!tmp_string_2!"=="onStartInstallApp" set result=true
 			if "!tmp_string_2!"=="onBeforeInstallingApp" set result=true
 			if "!tmp_string_2!"=="onAfterInstallingApp" set result=true
 			if "!tmp_string_2!"=="onInstallAppCompleted" set result=true
+			if "!tmp_string_2!"=="onStartPushFile" set result=true
 			if "!tmp_string_2!"=="onBeforePushingFile" set result=true
 			if "!tmp_string_2!"=="onAfterPushingFile" set result=true
+			if "!tmp_string_2!"=="onPushFileCompleted" set result=true
+			if "!tmp_string_2!"=="onCoreLogicFinish" set result=true
 			if "!tmp_string_2!"=="onCoreFinish" set result=true
 			if "!result!"=="false" (
 				echo 错误的生命周期 !tmp_string_2! ，脚本将停止解析插件配置文件并退出
@@ -701,14 +713,19 @@ goto eof
 
 @rem Execute plugin on life cycle
 @rem 
-@rem return void
+@rem return boolean Return false that no execute next life cycle,default is true
 @rem param_3 string Life cycle name
 @rem param_4 string Device serial
 @rem param_5 Applicathion or file absolute path 
 :executeLifeCycle
 	if "!lifeCycle_%~n3!" neq "null" (
 		for %%t in (!lifeCycle_%~n3!) do (
-			call .\opt\%%t void opt "%~n3" "%~n4" "%~5"
+			call .\opt\%%t boolean opt "%~n3" "%~n4" "%~5"
+			if "!boolean!"=="" (
+				set %~1=true
+			) else (
+				set %~1=!boolean!
+			)
 		)
 	)
 goto eof
@@ -826,17 +843,35 @@ goto eof
 	title [%~3] --- script_running
 	call %~n0 void setDeviceOptSatu %~3 script_running
 	echo ---------- 设备：%~3 ----------
-	call %~n0 void executeLifeCycle "onCoreStart" "%~n3"
+	call %~n0 boolean executeLifeCycle "onCoreStart" "%~n3"
 	echo -------------------------------
-	call %~n0 boolean installApp %~3
-	if "!boolean!"=="false" goto faild
+	if "!boolean!"=="true" (
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onStartInstallApp" "%~n3"
+		echo -------------------------------
+		if "!boolean!"=="true" (
+			call %~n0 boolean installApp %~3
+			if "!boolean!"=="false" goto faild
+			echo -------------------------------
+			call %~n0 boolean executeLifeCycle "onInstallAppCompleted" "%~n3"
+			echo -------------------------------
+		)
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onStartPushFile" "%~n3"
+		echo -------------------------------
+		if "!boolean!"=="true" (
+			call %~n0 boolean pushFiles %~3
+			if "!boolean!"=="false" goto faild
+			echo -------------------------------
+			call %~n0 boolean executeLifeCycle "onPushFileCompleted" "%~n3"
+			echo -------------------------------
+		)
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onCoreLogicFinish" "%~n3"
+		echo -------------------------------
+	)
 	echo -------------------------------
-	call %~n0 void executeLifeCycle "onInstallAppCompleted" "%~n3"
-	echo -------------------------------
-	call %~n0 boolean pushFiles %~3
-	if "!boolean!"=="false" goto faild
-	echo -------------------------------
-	call %~n0 void executeLifeCycle "onCoreFinish" "%~n3"
+	call %~n0 boolean executeLifeCycle "onCoreFinish" "%~n3"
 	echo -------------------------------
 	call %~n0 void openSettingActivity %~3
 	echo -------------------------------
@@ -861,17 +896,30 @@ goto eof
 	@rem for %%t in (.\app\*.apk) do (
 	@rem 	set /a tmp_int_1= !tmp_int_1! + 1
 	@rem )
-	echo 准备开始安装应用。。。。
-	adb.exe -s %~3 shell rm /data/local/tmp/*
+	@rem echo 准备开始安装应用。。。。
 	for %%t in (.\app\*.apk) do (
-		call %~n0 void executeLifeCycle "onBeforeInstallingApp" "%~n3" "%~dp0app\%%~nxt"
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onBeforeInstallingApp" "%~n3" "%~dp0app\%%~nxt"
+		echo -------------------------------
 		set /a tmp_int_3= !tmp_int_3! + 1
-		adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
-		@rem start /min %~n0 void installApp_t_1 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt" "/sdcard/%%~nxt"
-		@rem start /min %~n0 void installApp_t_2 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt"
-		adb.exe -s %~3 shell pm install -r /sdcard/%%~nxt
-		call %~n0 void executeLifeCycle "onAfterInstallingApp" "%~n3" "%~dp0app\%%~nxt"
-		echo 第 !tmp_int_3! 个应用 %%~nxt 安装完成
+		if "!boolean!"=="true" (
+			echo 正在安装第 !tmp_int_3! 个应用 %%~nxt 
+			adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
+			@rem start /min %~n0 void installApp_t_1 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt" "/sdcard/%%~nxt"
+			@rem start /min %~n0 void installApp_t_2 %~3 !tmp_int_3! "/data/local/tmp/%%~nxt"
+			adb.exe -s %~3 shell pm install -r /sdcard/%%~nxt
+			if %errorlevel% geq 1 (
+				echo %%~t 安装失败
+				set result=false
+				goto installApp_b_1
+			)
+			echo -------------------------------
+			call %~n0 boolean executeLifeCycle "onAfterInstallingApp" "%~n3" "%~dp0app\%%~nxt"
+			echo -------------------------------
+			echo 第 !tmp_int_3! 个应用 %%~nxt 安装完成
+		) else (
+			echo 跳过第 !tmp_int_3! 个应用的安装
+		)
 	)
 	@rem :installApp_l_1
 	@rem set tmp_int_3=0
@@ -885,6 +933,7 @@ goto eof
 	@rem goto installApp_l_1
 	@rem echo %%~t !tmp_int_1! 个应用安装完成
 	@rem :installApp_b_1
+	:installApp_b_1
 	set %~1=!result!
 goto eof
 
@@ -928,68 +977,27 @@ goto eof
 	set result=true
 	set tmp_int_1=0
 	for %%t in (.\files\*) do (
-		call %~n0 void executeLifeCycle "onBeforePushingFile" "%~n3" "%~dp0files\%%~nxt"
+		echo -------------------------------
+		call %~n0 boolean executeLifeCycle "onBeforePushingFile" "%~n3" "%~dp0files\%%~nxt"
+		echo -------------------------------
 		set /a tmp_int_1= !tmp_int_1! + 1
-		echo 正在推送第 !tmp_int_1! 个文件：
-		echo %%~t
-		adb.exe -s %~3 push "%%~t" /sdcard/%%~nxt
-		if %errorlevel% geq 1 (
-			echo %%~t 推送失败
-			set result=false
-			goto pushFiles_b_1
+		if "!boolean!"=="true" (
+			echo 正在推送第 !tmp_int_1! 个文件：%%~t
+			adb.exe -s %~3 push "%%~t" /sdcard/%%~nxt
+			if %errorlevel% geq 1 (
+				echo %%~t 推送失败
+				set result=false
+				goto pushFiles_b_1
+			)
+			echo -------------------------------
+			call %~n0 boolean executeLifeCycle "onAfterPushingFile" "%~n3" "%~dp0files\%%~nxt"
+			echo -------------------------------
+			echo 第 !tmp_int_1! 个文件：%%~t 推送完成
+		) else (
+			echo 跳过第 !tmp_int_1! 个文件 ’%%~t‘ 的推送
 		)
-		call %~n0 void executeLifeCycle "onAfterPushingFile" "%~n3" "%~dp0files\%%~nxt"
-		echo %%~t 推送完成
 	)
 	:pushFiles_b_1
-	set %~1=!result!
-goto eof
-
-@rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-@rem  这个方法废弃了，已经用生命周期机制代替
-@rem !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-@rem Applicathin operation for device by "input" command 
-@rem Usage: input [<source>] <command> [<arg>...]
-@rem 
-@rem The sources are:
-@rem       mouse
-@rem       keyboard
-@rem       joystick
-@rem       touchnavigation
-@rem       touchpad
-@rem       trackball
-@rem       stylus
-@rem       dpad
-@rem       touchscreen
-@rem       gamepad
-@rem 
-@rem The commands and default sources are:
-@rem       text <string> (Default: touchscreen)
-@rem       keyevent [--longpress] <key code number or name> ... (Default: keyboard)
-@rem       tap <x> <y> (Default: touchscreen)
-@rem       swipe <x1> <y1> <x2> <y2> [duration(ms)] (Default: touchscreen)
-@rem       press (Default: trackball)
-@rem       roll <dx> <dy> (Default: trackball)
-@rem
-@rem 
-@rem return boolean If success to excute operation file that return true,otherwise return false
-@rem param_3 string Device serial number
-:applicationOperation
-	adb.exe -s %~3 shell am force-stop com.android.settings
-	adb.exe -s %~3 shell input keyevent KEYCODE_WAKEUP
-	adb.exe -s %~3 shell input touchscreen swipe 300 460 300 0 150
-	set result=true
-	for %%t in (.\opt\*.bat) do (
-		set tmp_string_1=%%~t
-		call %%~ft void opt %~3
-		if %errorlevel% geq 1 (
-			echo %%~t 动作执行失败
-			set result=false
-			goto applicationOperation_b_1
-		)
-		echo %%~t 动作执行完成
-	)
-	:applicationOperation_b_1
 	set %~1=!result!
 goto eof
 

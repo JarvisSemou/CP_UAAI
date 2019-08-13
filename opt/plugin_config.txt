@@ -1,25 +1,46 @@
 ##########################################################################################
 #	当前文件是脚本的插件配置文件
 #
-#	文件版本：0.0.1
+#	文件版本：0.0.2
 #
 #	当前配置文件使用说明：
 #		1、"#" 开头的行是注释行，脚本不会解析注释行。“#” 一定要放在开头，否则解析会出错
 #		2、脚本的生命周期有这几个，分别会在这些生命周期里调用对应配置的插件：
 #				周期名字				周期调用时期及意义
 #			（1）onScriptFirstStart		在脚本初始化完成，且还没开始循环执行业务逻辑时被调用，只会执行一次
-#			（2）onCoreStart			在开始执行业务逻辑时被调用，对于每台设备只会执行一次
-#			（3）onBeforeInstallingApp	在开始安装一个应用前被调用，每迭代到 .\app 目录下的一个应用的时候就
-#										调用一次，对于每台设备一般会被多次调用
-#			（4）onAfterInstallingApp	在结束安装一个应用的安装时被调用，其调用频率与 onAfterInstallingApp 一样，
-#										只是在当前应用安装完成后被调用，对于每台设备一般会多次调用
-#			（5）onInstallAppCompleted	在结束安装业务逻辑后被调用，对于每台设备只会被调用一次，此生命周期通常用来准备
-#										推送文件业务逻辑
-#			（6）onBeforePushingFile	在开始推送一个文件时被调用，每迭代到 .\files 目录下的一个文件的时候
-#										就调用一次，对于每台设备一般会被多次调用
-#			（7）onAfterPushingFile		在结束推送一个文件的推送时被调用，其调用频率与 onBeforeInstallingApp 一样，
-#										只是在当前文件推送完成后被调用，对于每台设备一般会多次调用
-#			（8）onCoreFinish			在业务逻辑执行完成时被调用，对于每台设备只会执行一次
+#
+#			（2）onCoreStart			在开始执行业务逻辑时被调用，对于每台设备只会执行一次,可通过返回 false 阻止
+#										这些生命周期执行：onStartInstallApp、onBeforeInstallingApp、onAfterInstallingApp、
+#										onInstallAppCompleted、onStartPushFile、onBeforePushingFile、onAfterPushingFile、
+#										onPushFileCompleted、onCoreLogicFinish
+#
+#			（3）onStartInstallApp		在开始执行应用安装逻辑时执行一次，可以通过返回 false 阻止整个应用安装生命周期，即：
+#										onBeforeInstallingApp、onAfterInstallingApp、onInstallAppCompleted
+#
+#			（4）onBeforeInstallingApp	在开始安装一个应用前被调用，每迭代到 .\app 目录下的一个应用的时候就
+#										调用一次，对于每台设备一般会被多次调用，可以通过返回 false 跳过当前应用的安装，但
+#										不会阻止应用安装逻辑，会阻止 onAfterInstallingApp 生命周期的执行
+#
+#			（5）onAfterInstallingApp	在结束安装一个应用的安装时被调用，可以被 onBeforeInstallingApp 生命周期阻止执行。
+#										只在当前应用安装完成后被调用，对于每台设备一般会多次调用
+#
+#			（6）onInstallAppCompleted	在结束应用安装逻辑后被调用，对于每台设备只会被调用一次
+#
+#			（7）onStartPushFile		在开始执行文件推送逻辑时执行一次，可以通过返回 false 阻止整个文件推送逻辑生命周期，即：
+#										onBeforePushingFile、onAfterPushingFile、onPushFileCompleted
+#
+#			（8）onBeforePushingFile	在开始推送一个文件时被调用，每迭代到 .\files 目录下的一个文件的时候
+#										就调用一次，对于每台设备一般会被多次调用，可以通过返回 false 跳过当前文件的推送，但
+#										不会阻止文件推送逻辑，会阻止 onAfterPushingFile 生命周期的执行
+#
+#			（9）onAfterPushingFile		在结束推送一个文件的推送时被调用，可以被 onBeforeInstallingApp 生命周期阻止执行。
+#										只在当前文件推送完成后被调用，对于每台设备一般会多次调用
+#
+#			（10）onPushFileCompleted	在结束文件推送逻辑后被调用，对于每台设备只会被调用一次
+#
+#			（11）onCoreLogicFinish		在结束业务逻辑时被调用，可以被 onCoreStart 生命周期阻止执行
+#
+#			（8）onCoreFinish			在业务逻辑执行完成时被调用，不可以被 onCoreStart 生命周期阻止执行，对于每台设备只会执行一次
 #		3、脚本在调用插件时，目前传两个参数，第一个参数（param_3，通过 “%~n3” 引用）是当前生命周期的名字，例如“onScriptFirstStart”;
 #			第二个参数（param_4，通过 “%~n4” 引用）是当前设备的序列号。对于”onBeforeInstallingApp“、
 #			”onAfterInstallingApp“两个生命周期，还会传入第三个参数（param_5，通过 ”%~n5“ 引用），该参数是当前安装的应用
@@ -96,6 +117,12 @@
 
 
 
+#开始应用安装逻辑
+:onStartInstallApp
+
+
+
+
 #开始安装一个应用
 :onBeforeInstallingApp
 
@@ -108,8 +135,14 @@
 
 
 
-#安装业务逻辑完成
+#安装应用逻辑完成
 :onInstallAppCompleted
+
+
+
+
+#开始推送文件逻辑
+:onStartPushFile
 
 
 
@@ -126,5 +159,19 @@
 
 
 
+#文件推送逻辑完成
+:onPushFileCompleted
+
+
+
+
 #业务逻辑执行完毕
+:onCoreLogicFinish
+
+
+
+
+#核心逻辑执行完毕
 :onCoreFinish
+
+
