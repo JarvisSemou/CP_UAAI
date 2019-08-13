@@ -40,7 +40,7 @@
 #
 #			（11）onCoreLogicFinish		在结束业务逻辑时被调用，可以被 onCoreStart 生命周期阻止执行
 #
-#			（8）onCoreFinish			在业务逻辑执行完成时被调用，不可以被 onCoreStart 生命周期阻止执行，对于每台设备只会执行一次
+#			（12）onCoreFinish			在业务逻辑执行完成时被调用，不可以被 onCoreStart 生命周期阻止执行，对于每台设备只会执行一次
 #		3、脚本在调用插件时，目前传两个参数，第一个参数（param_3，通过 “%~n3” 引用）是当前生命周期的名字，例如“onScriptFirstStart”;
 #			第二个参数（param_4，通过 “%~n4” 引用）是当前设备的序列号。对于”onBeforeInstallingApp“、
 #			”onAfterInstallingApp“两个生命周期，还会传入第三个参数（param_5，通过 ”%~n5“ 引用），该参数是当前安装的应用
