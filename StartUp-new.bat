@@ -541,7 +541,7 @@ goto eof
 @rem return boolean If port 5037 Occupied that return true,otherwise return false  
 :is5037Occupied
 	set result=false
-	netstat -ano|findstr 127.0.0.1:5037 1>nul
+	netstat -ano|findstr "127.0.0.1:5037$" 1>nul
 	if "%errorlevel%"=="0" set result=true
 	set %~1=!result!
 goto eof
