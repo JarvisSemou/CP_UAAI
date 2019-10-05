@@ -1,5 +1,6 @@
 @echo off
 @rem 插件名称：模板插件
+@rem 插件版本：0.0.1
 @rem 插件描述：这是一个模板插件。
 @rem 生命周期：onStartInstallApp、onStartPushFile        （声明周期指示当前插件通过配置文件注册在哪个生命周期里）
 @rem 插件功能：
