@@ -1,11 +1,12 @@
 @echo off
-@rem è¿™æ˜¯ä¸€ä¸ªæ¨¡æ¿æ’ä»¶ã€‚
-@rem å½“å‰æ’ä»¶é€šè¿‡é…ç½®æ–‡ä»¶æ³¨å†Œåœ¨ä¸‹åˆ—ç”Ÿå‘½å‘¨æœŸé‡Œï¼šonStartInstallAppã€onStartPushFile
-@rem å½“å‰æ’ä»¶æœ‰ä¸¤ä¸ªè¡Œä¸ºï¼š
-@rem 1ã€å½“å¤„äºŽâ€onStartInstallAppâ€œç”Ÿå‘½å‘¨æœŸæ—¶ï¼Œå¦‚æžœé‡åˆ°åºåˆ—å·ä¸ºâ€11111111â€œçš„è®¾å¤‡ï¼Œåˆ™
-@rem æ¨¡æ‹ŸæŒ‰ä¸‹ç”µæºé”®ï¼Œç„¶åŽä»Ž ï¼ˆ300ï¼Œ460ï¼‰åæ ‡å¼€å§‹æ¨¡æ‹Ÿæ‰‹æŒ‡æ»‘åŠ¨åˆ° ï¼ˆ300ï¼Œ0ï¼‰ åæ ‡ï¼Œ
-@rem è€—æ—¶ 150 æ¯«ç§’ï¼Œç„¶åŽæ‰“å¼€ç³»ç»Ÿè®¾ç½®ç•Œé¢
-@rem 2ã€å–æ¶ˆå¾€æ‰€æœ‰è®¾å¤‡æŽ¨é€ files ç›®å½•ä¸‹æ‰€æœ‰æ–‡ä»¶çš„é€»è¾‘
+@rem ²å¼þÃû³Æ£ºÄ£°å²å¼þ
+@rem ²å¼þÃèÊö£ºÕâÊÇÒ»¸öÄ£°å²å¼þ¡£
+@rem ÉúÃüÖÜÆÚ£ºonStartInstallApp¡¢onStartPushFile        £¨ÉùÃ÷ÖÜÆÚÖ¸Ê¾µ±Ç°²å¼þÍ¨¹ýÅäÖÃÎÄ¼þ×¢²áÔÚÄÄ¸öÉúÃüÖÜÆÚÀï£©
+@rem ²å¼þ¹¦ÄÜ£º
+@rem	1¡¢µ±´¦ÓÚ¡±onStartInstallApp¡°ÉúÃüÖÜÆÚÊ±£¬Èç¹ûÓöµ½ÐòÁÐºÅÎª¡±11111111¡°µÄÉè±¸£¬Ôò
+@rem 	Ä£Äâ°´ÏÂµçÔ´¼ü£¬È»ºó´Ó £¨300£¬460£©×ø±ê¿ªÊ¼Ä£ÄâÊÖÖ¸»¬¶¯µ½ £¨300£¬0£© ×ø±ê£¬
+@rem 	ºÄÊ± 150 ºÁÃë£¬È»ºó´ò¿ªÏµÍ³ÉèÖÃ½çÃæ
+@rem 	2¡¢È¡ÏûÍùËùÓÐÉè±¸ÍÆËÍ files Ä¿Â¼ÏÂËùÓÐÎÄ¼þµÄÂß¼­
 if "%~2"=="" (
 	setlocal enabledelayedexpansion
 )
@@ -13,8 +14,8 @@ if "%~2"=="opt" goto opt
 goto eof
 
 @rem return boolean
-@rem param_3 å‘¨æœŸåå­—
-@rem param_4 åºåˆ—å·
+@rem param_3 ÖÜÆÚÃû×Ö
+@rem param_4 ÐòÁÐºÅ
 :opt
 	if "%~3"=="onStartInstallApp" (
 		if "%~4"=="11111111" (
