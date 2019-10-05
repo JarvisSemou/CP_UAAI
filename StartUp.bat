@@ -501,6 +501,54 @@ goto eof
 @rem return void
 :createNewPluginConfigFile
 	echo #	This is new config file without document >.\opt\plugin_config.txt
+	echo :onScriptFirstStart>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onCoreStart>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onStartInstallApp>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onBeforeInstallingApp>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onAfterInstallingApp>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onInstallAppCompleted>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onStartPushFile>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onBeforePushingFile>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onAfterPushingFile>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onPushFileCompleted>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onCoreLogicFinish>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo :onCoreFinish>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
+	echo.>>.\opt\plugin_config.txt
 goto eof
 
 @rem Execute plugin on life cycle
