@@ -344,7 +344,7 @@ goto eof
 :get5037ProcessName
 	set result=null
 	set tmp_int_1=0
-	for /f "tokens=4,5" %%i in ('netstat -ano^|findstr 127.0.0.1:5037') do (
+	for /f "tokens=4,5" %%i in ('netstat -ano^|findstr 127.0.0.1:5037$') do (
 		for /f "usebackq" %%n in (`tasklist /nh /fi "pid eq %%j"`) do (
 			if "%%i"=="LISTENING" (
 				set result=%%n
