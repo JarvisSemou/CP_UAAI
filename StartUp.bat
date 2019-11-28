@@ -500,52 +500,52 @@ goto eof
 @rem
 @rem return void
 :createNewPluginConfigFile
-	echo #	This is new config file without document >.\opt\plugin_config.txt
-	echo :onScriptFirstStart>>.\opt\plugin_config.txt
+	echo #	This is new config file without document 1>.\opt\plugin_config.txt
+	echo :onScriptFirstStart 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onCoreStart>>.\opt\plugin_config.txt
+	echo :onCoreStart 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onStartInstallApp>>.\opt\plugin_config.txt
+	echo :onStartInstallApp 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onBeforeInstallingApp>>.\opt\plugin_config.txt
+	echo :onBeforeInstallingApp 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onAfterInstallingApp>>.\opt\plugin_config.txt
+	echo :onAfterInstallingApp 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onInstallAppCompleted>>.\opt\plugin_config.txt
+	echo :onInstallAppCompleted 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onStartPushFile>>.\opt\plugin_config.txt
+	echo :onStartPushFile 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onBeforePushingFile>>.\opt\plugin_config.txt
+	echo :onBeforePushingFile 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onAfterPushingFile>>.\opt\plugin_config.txt
+	echo :onAfterPushingFile 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onPushFileCompleted>>.\opt\plugin_config.txt
+	echo :onPushFileCompleted 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onCoreLogicFinish>>.\opt\plugin_config.txt
+	echo :onCoreLogicFinish 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
-	echo :onCoreFinish>>.\opt\plugin_config.txt
+	echo :onCoreFinish 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
@@ -698,8 +698,8 @@ goto eof
 		set /a tmp_int_3= !tmp_int_3! + 1
 		if "!boolean!"=="true" (
 			echo 正在安装第 !tmp_int_3! 个应用 %%~nxt 
-			adb.exe -s %~3 push ".\app\%%~nxt" /sdcard/%%~nxt
-			adb.exe -s %~3 shell pm install -r /sdcard/%%~nxt
+			adb.exe -s %~3 push ".\app\%%~nxt" "/sdcard/%%~nxt"
+			adb.exe -s %~3 shell pm install -r "/sdcard/%%~nxt"
 			if %errorlevel% geq 1 (
 				echo %%~t 安装失败
 				set result=false
@@ -731,7 +731,7 @@ goto eof
 		set /a tmp_int_1= !tmp_int_1! + 1
 		if "!boolean!"=="true" (
 			echo 正在推送第 !tmp_int_1! 个文件：%%~t
-			adb.exe -s %~3 push "%%~t" /sdcard/%%~nxt
+			adb.exe -s %~3 push "%%~t" "/sdcard/%%~nxt"
 			if %errorlevel% geq 1 (
 				echo %%~t 推送失败
 				set result=false
