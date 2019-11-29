@@ -57,6 +57,8 @@ if "%~2"=="" (
 )
 :methodBrach
 	if "%~2"=="" goto main
+	if "%~2"=="initScript" goto initScript
+	if "%~2"=="startMainLoop" goto startMainLoop
 	if "%~2"=="isPathLegitimate" goto isPathLegitimate
 	if "%~2"=="printNostartAdbPage_1" goto printNostartAdbPage_1
 	if "%~2"=="printNostartAdbPage_2" goto printNostartAdbPage_2
@@ -118,6 +120,16 @@ goto eof
 goto eof
 
 :main
+	@rem 初始化脚本
+	call %~n0 void initScript
+	@rem 执行主循环
+	call %~n0 void startMainLoop
+goto eof
+
+@rem Init script
+@rem
+@rem return void
+:initScript
 	title CP_UAAI  ---  Mouse.JiangWei     :-D
 	echo [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[@
 	echo                                                                                      @
@@ -197,6 +209,12 @@ goto eof
 	set array_processing_serial=null
 	@rem 当前连接到电脑的设备序列号列表（无视状态）
 	set array_devices_serial=null
+goto eof
+
+@rem Start main loop
+@rem
+@rem return void
+:startMainLoop
 	:main_loop_1
 	@rem 每秒刷新连接设备列表
 	cls
