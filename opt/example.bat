@@ -1,6 +1,6 @@
 @echo off
 @rem 插件名称：模板插件
-@rem 插件版本：0.0.1
+@rem 插件版本：0.0.2
 @rem 插件描述：这是一个模板插件。
 @rem 生命周期：onStartInstallApp、onStartPushFile        （声明周期指示当前插件通过配置文件注册在哪个生命周期里）
 @rem 插件功能：
@@ -20,10 +20,10 @@ goto eof
 :opt
 	if "%~3"=="onStartInstallApp" (
 		if "%~4"=="11111111" (
-			adb.exe -s %~3 shell am force-stop com.android.settings
-			adb.exe -s %~3 shell input keyevent KEYCODE_WAKEUP
-			adb.exe -s %~3 shell input touchscreen swipe 300 460 300 0 150
-			adb.exe -s %~3 shell am start -n com.android.settings/com.android.settings.Settings
+			adb.exe -s %~4 shell am force-stop com.android.settings
+			adb.exe -s %~4 shell input keyevent KEYCODE_WAKEUP
+			adb.exe -s %~4 shell input touchscreen swipe 300 460 300 0 150
+			adb.exe -s %~4 shell am start -n com.android.settings/com.android.settings.Settings
 		)
 	)
 	if "%~3"=="onStartPushFile" (
