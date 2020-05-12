@@ -1,7 +1,7 @@
 ##########################################################################################
 #	当前文件是脚本的插件配置文件
 #
-#	文件版本：0.0.2
+#	配置格式版本：0.0.3
 #
 #	当前配置文件使用说明：
 #		1、"#" 开头的行是注释行，脚本不会解析注释行。“#” 一定要放在开头，否则解析会出错
@@ -41,17 +41,18 @@
 #			（11）onCoreLogicFinish		在结束业务逻辑时被调用，可以被 onCoreStart 生命周期阻止执行
 #
 #			（12）onCoreFinish			在业务逻辑执行完成时被调用，不可以被 onCoreStart 生命周期阻止执行，对于每台设备只会执行一次
-#		3、脚本在调用插件时，目前传两个参数，第一个参数（param_3，通过 “%~n3” 引用）是当前生命周期的名字，例如“onScriptFirstStart”;
-#			第二个参数（param_4，通过 “%~n4” 引用）是当前设备的序列号。对于”onBeforeInstallingApp“、
-#			”onAfterInstallingApp“两个生命周期，还会传入第三个参数（param_5，通过 ”%~n5“ 引用），该参数是当前安装的应用
-#			的绝对路径；对于”onBeforePushingFile“、”onAfterPushingFile“两个生命周期，也会传入第三个参数（param_5，通过
-#			”%~n5“引用），该参数是当前推送的文件的绝对路径。对于 "onScriptFirstStart" 生命周期只传第一参数。
+#		3、脚本在调用插件时，目前传入四个参数，第一个参数（param_3，通过 “%~3” 引用）是当前生命周期的名字，例如“onScriptFirstStart”;
+#			第二个参数（param_4，通过 “%~4” 引用）是当前设备的序列号；第三个参数（param_5，通过 “%~5” 引用）是当前设备的传输号，作用
+#			与序列号一致，都用来识别设备。对于“onBeforeInstallingApp”、	“onAfterInstallingApp”两个生命周期，还会传入第四个参数
+#			（param_6，通过 “%~6” 引用），该参数是当前安装的应用的绝对路径；对于“onBeforePushingFile”、“onAfterPushingFile”两个
+#			生命周期，也会传入第四个参数（param_6，通过“%~6”引用），该参数是当前推送的文件的绝对路径。对于 "onScriptFirstStart" 生命
+#			周期只传第一参数。
 #		4、当前配置文件的规则：
 #			（1）以 “:” 开头，后面紧跟生命周期的名字，表示准备注册在之后的行中出现的插件，让插件在当前生命周期被调用，
-#					例如：“:onScriptFirstStart”、”:onCoreFinish“
-#			（2）不以 ”:“ 开头的是插件文件的名字，表示要在对应生命周期被调用的插件，插件名只能由英文字母和阿拉伯数字
-#					组成，文件名不能有空格，且必须包含 ”.bat“ 后缀，例如：”PushMyFile.bat“、”UnInstallVPN.bat“。插件名后
-#					可以用 ”#“ 写注释
+#					例如：“:onScriptFirstStart”、“:onCoreFinish”
+#			（2）不以 “:” 开头的是插件文件的名字，表示要在对应生命周期被调用的插件，插件名只能由英文字母和阿拉伯数字
+#					组成，文件名不能有空格，且必须包含 “.bat” 后缀，例如：“PushMyFile.bat”、“UnInstallVPN.bat”。插件名后
+#					可以用 “#” 写注释
 #			（3）插件注册的顺序影响调用的顺序，先注册的先调用
 #			（4）一行只注册一个插件，空行不会被解析
 #			（5）生命周期名和插件名前都没有空格
@@ -83,17 +84,21 @@
 #
 #	插件编写模板
 #		@echo off
-#		@rem 描述插件用途
-#		if "%~n2"=="" ( 
+#		@rem 填写插件的名称、版本、描述、支持的生命周期及插件的功能
+#		if "%~2"=="" ( 
 #			setlocal enabledelayedexpansion
 #			goto opt
 #		)
-#		if "%~n2"=="opt" goto opt
+#		if "%~2"=="opt" goto opt
 #		goto eof
 #		
-#		@rem return void
-#		@rem param_3 周期名字
-#		@rem param_4 序列号
+#		@rem 生命周期回调接口
+#		@rem
+#		@rem return boolean
+#		@rem param_3 string 周期名字
+#		@rem param_4 string 序列号
+#		@rem param_5 int	传输号
+#		@rem param_6 string 文件的绝对路径
 #		:opt 
 #			@rem 这里开始写正式插件代码
 #

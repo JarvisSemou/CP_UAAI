@@ -1,4 +1,9 @@
 @echo off
+@rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+@rem ::	version: v0.0.3													::
+@rem ::	author: Mouse.JiangWei											::
+@rem ::	date: 2020.5.12													::
+@rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @rem 插件名称：模板插件
 @rem 插件版本：0.0.2
 @rem 插件描述：这是一个模板插件。
@@ -20,9 +25,10 @@ goto eof
 @rem 生命周期回调接口
 @rem
 @rem return boolean
-@rem param_3 周期名字
-@rem param_4 序列号
-@rem param_5 传输号
+@rem param_3 string 周期名字
+@rem param_4 string 序列号
+@rem param_5 int	传输号
+@rem param_6 string 文件的绝对路径
 :opt
 	if "%~3"=="onStartInstallApp" (
 		if "%~4"=="11111111" (
