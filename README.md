@@ -14,7 +14,7 @@
 
 ## 用法
 
-&emsp;&emsp;将对应文件放到对应文件夹，再运行 StartUP.bat 就行。对于插件开发模板即配置方式，参考 [example.bat] 插件模板文件以及 [plugin_config.txt] 插件配置文件
+&emsp;&emsp;将对应文件放到对应文件夹，再运行 StartUP.bat 就行。对于插件开发模板及配置方式，参考 [example.bat] 插件模板文件以及 [plugin_config.txt] 插件配置文件
 
 ### 注意
 
