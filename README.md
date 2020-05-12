@@ -21,6 +21,23 @@
 1. 在我的 win 10 电脑上，当脚本窗口失去焦点或被鼠标点击时，脚本会暂停，这时候只需要用鼠标点击脚本窗口，然后按 enter 键，脚本就能继续运行了
 2. 当前版本脚本会不断读写 %tmp% 目录，对磁盘性能消耗较大
 
+## 生命周期说明
+
+|生命周期|生命周期作用|
+|:-:|:-|
+| onScriptFirstStart | 在脚本初始化完成，且还没开始循环执行业务逻辑时被调用，只会执行一次|
+|onCoreStart|在开始执行业务逻辑时被调用，对于每台设备只会执行一次,可通过返回 false 阻止这些生命周期执行：<br/>onStartInstallApp、<br/>onBeforeInstallingApp、<br/>onAfterInstallingApp、<br/>onInstallAppCompleted、<br/>onStartPushFile、<br/>onBeforePushingFile、<br/>onAfterPushingFile、<br/>onPushFileCompleted、<br/>onCoreLogicFinish|
+| onStartInstallApp | 在开始执行应用安装逻辑时执行一次，可以通过返回 false 阻止整个应用安装生命周期，即：<br/>onBeforeInstallingApp、<br/>onAfterInstallingApp、<br/>onInstallAppCompleted|
+| onBeforeInstallingApp | 在开始安装一个应用前被调用，每迭代到 .\app 目录下的一个应用的时候就调用一次，对于每台设备一般会被多次调用，可以通过返回 false 跳过当前应用的安装，但不会阻止应用安装逻辑，会阻止 onAfterInstallingApp 生命周期的执行|
+| onAfterInstallingApp | 在结束安装一个应用的安装时被调用，可以被 onBeforeInstallingApp 生命周期阻止执行。只在当前应用安装完成后被调用，对于每台设备一般会多次调用|
+| onInstallAppCompleted | 在结束应用安装逻辑后被调用，对于每台设备只会被调用一次|
+| onStartPushFile | 在开始执行文件推送逻辑时执行一次，可以通过返回 false 阻止整个文件推送逻辑生命周期，即：<br/>onBeforePushingFile、<br/>onAfterPushingFile、<br/>onPushFileCompleted|
+| onBeforePushingFile | 在开始推送一个文件时被调用，每迭代到 .\files 目录下的一个文件的时候就调用一次，对于每台设备一般会被多次调用，可以通过返回 false 跳过当前文件的推送，但不会阻止文件推送逻辑，会阻止 onAfterPushingFile 生命周期的执行|
+| onAfterPushingFile | 在结束推送一个文件的推送时被调用，可以被 onBeforeInstallingApp 生命周期阻止执行。只在当前文件推送完成后被调用，对于每台设备一般会多次调用|
+| onPushFileCompleted | 在结束文件推送逻辑后被调用，对于每台设备只会被调用一次|
+| onCoreLogicFinish | 在结束业务逻辑时被调用，可以被 onCoreStart 生命周期阻止执行|
+| onCoreFinish | 在业务逻辑执行完成时被调用，不可以被 onCoreStart 生命周期阻止执行，对于每台设备只会执行一次|
+
 ## 更新历史
 
 ---
