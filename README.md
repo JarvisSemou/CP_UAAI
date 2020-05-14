@@ -26,12 +26,12 @@
 |生命周期|生命周期作用|
 |:-:|:-|
 | onScriptFirstStart | 在脚本初始化完成，且还没开始循环执行业务逻辑时被调用，只会执行一次|
-|onCoreStart|在开始执行业务逻辑时被调用，对于每台设备只会执行一次,可通过返回 `false` 阻止这些生命周期执行：<br/>`onStartInstallApp`、<br/>`onBeforeInstallingApp`、<br/>`onAfterInstallingApp`、<br/>`onInstallAppCompleted`、<br/>`onStartPushFile`、<br/>`onBeforePushingFile`、<br/>`onAfterPushingFile`、<br/>`onPushFileCompleted`、<br/>`onCoreLogicFinish`|
-| onStartInstallApp | 在开始执行应用安装逻辑时执行一次，可以通过返回 `false` 阻止整个应用安装生命周期，即：<br/>`onBeforeInstallingApp`、<br/>`onAfterInstallingApp`、<br/>`onInstallAppCompleted`|
+|onCoreStart|在开始执行业务逻辑时被调用，对于每台设备只会执行一次,可通过返回 `false` 阻止这些生命周期执行：<br/>`onStartInstallApp`<br/>`onBeforeInstallingApp`<br/>`onAfterInstallingApp`<br/>`onInstallAppCompleted`<br/>`onStartPushFile`<br/>`onBeforePushingFile`<br/>`onAfterPushingFile`<br/>`onPushFileCompleted`<br/>`onCoreLogicFinish`|
+| onStartInstallApp | 在开始执行应用安装逻辑时执行一次，可以通过返回 `false` 阻止整个应用安装生命周期，即：<br/>`onBeforeInstallingApp`<br/>`onAfterInstallingApp`<br/>`onInstallAppCompleted`|
 | onBeforeInstallingApp | 在开始安装一个应用前被调用，每迭代到 `.\app` 目录下的一个应用的时候就调用一次，对于每台设备一般会被多次调用，可以通过返回 false 跳过当前应用的安装，但不会阻止应用安装逻辑，会阻止 `onAfterInstallingApp` 生命周期的执行|
 | onAfterInstallingApp | 在结束安装一个应用的安装时被调用，可以被 `onBeforeInstallingApp` 生命周期阻止执行。只在当前应用安装完成后被调用，对于每台设备一般会多次调用|
 | onInstallAppCompleted | 在结束应用安装逻辑后被调用，对于每台设备只会被调用一次|
-| onStartPushFile | 在开始执行文件推送逻辑时执行一次，可以通过返回 `false` 阻止整个文件推送逻辑生命周期，即：<br/>`onBeforePushingFile`、<br/>`onAfterPushingFile`、<br/>`onPushFileCompleted`|
+| onStartPushFile | 在开始执行文件推送逻辑时执行一次，可以通过返回 `false` 阻止整个文件推送逻辑生命周期，即：<br/>`onBeforePushingFile`<br/>`onAfterPushingFile`<br/>`onPushFileCompleted`|
 | onBeforePushingFile | 在开始推送一个文件时被调用，每迭代到 `.\files` 目录下的一个文件的时候就调用一次，对于每台设备一般会被多次调用，可以通过返回 `false` 跳过当前文件的推送，但不会阻止文件推送逻辑，会阻止 `onAfterPushingFile` 生命周期的执行|
 | onAfterPushingFile | 在结束推送一个文件的推送时被调用，可以被 `onBeforeInstallingApp` 生命周期阻止执行。只在当前文件推送完成后被调用，对于每台设备一般会多次调用|
 | onPushFileCompleted | 在结束文件推送逻辑后被调用，对于每台设备只会被调用一次|
@@ -57,13 +57,20 @@
 4. 数组元素用英文逗号分隔，元素必须用英文双引号括住。<br/>例如：在数组“array_myList”中，里面的元素这样存储：`"item_1","item_2","item_3",...,"item_n"`。当数组没有元素时，值为不加双引号的“`null`”。
 5. 脚本必须打开延迟变量开关（`setlocal enableDelayedExpansion`）。
 6. 统一使用 `GB2312` 字符集。
-7. 方法格式：
+7. 方法内部标签格式：
+    - `:方法名_b_编号`  用于作为流程中断时跳转的目标
+    - `:方法名_l_编号`  用于作为普通流程中的跳转目标
+8. 方法格式：
 
         @rem 方法描述
         @rem
         @rem return 返回类型   对返回的数据的描述
         @rem param_3 数据类型  参数描述
         :方法名
+            @rem 跳转到一个方法内标签
+            gogo :方法名_l_1
+            :方法名_l_1
+            echo 已进行跳转
             @rem 使用 param_3 参数的代码例子
             set result=%~3
             @rem 返回数据的代码例子
@@ -71,7 +78,7 @@
         @rem 方法结束
         goto eof
 
-8. 脚本格式：
+9. 脚本格式：
 
         @echo off
         if "%~2"=="" (
@@ -108,21 +115,37 @@
 
 ---
 
+### 2.3.0
+
+1. 将开发约束说明移动到 README.md 文件中。
+2. 使用传输号代替序列号识别设备。
+3. 更新回调插件的接口参数，新接口传 4 个参数(多了传输号)，按顺序分别是：生命周期名字、序列号、传输号、文件的绝对路径。旧的插件在不使用“文件的绝对路径”这个参数的情况下，能兼容新此版本的回调接口。
+    |参数|参数类型|参数意义|
+    |:-:|:-:|:-|
+    |param_3|string|生命周期名字|
+    |param_4|string|序列号|
+    |param_5|int|传输号(新加入)|
+    |param_6|string|文件的绝对路径|
+4. 能显示自定义的设备状态。
+5. 对一些不严谨的文字描述进行修改。
+
+---
+
 ### 2.2.4
 
 1. 增加插件扩展功能，目前插件有如下生命周期
-    + onScriptFirstStart
-    + onCoreStart
-    + onStartInstallApp
-    + onBeforeInstallingApp
-    + onAfterInstallingApp
-    + onInstallAppCompleted
-    + onStartPushFile
-    + onBeforePushingFile
-    + onAfterPushingFile
-    + onPushFileCompleted
-    + onCoreLogicFinish
-    + onCoreFinish
+    - onScriptFirstStart
+    - onCoreStart
+    - onStartInstallApp
+    - onBeforeInstallingApp
+    - onAfterInstallingApp
+    - onInstallAppCompleted
+    - onStartPushFile
+    - onBeforePushingFile
+    - onAfterPushingFile
+    - onPushFileCompleted
+    - onCoreLogicFinish
+    - onCoreFinish
 
 ---
 
