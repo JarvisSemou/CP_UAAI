@@ -3,53 +3,12 @@
 @rem ::																	::
 @rem ::		  					CP_UAAI									::
 @rem ::																	::
-@rem ::											Author: Mouse.JiangWei	::
+@rem ::										Copyright: Mouse.JiangWei	::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+@rem ::	version: v2.3.0													::
+@rem ::	author: Mouse.JiangWei											::
+@rem ::	date: 2020.5.12													::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-@rem 
-@rem Some rules of development:
-@rem 	1.Variable name using camel rule,the object start with underline
-@rem 	2.Using double underline __ end of an array variable name,the 
-@rem 	  array element sparate with blackspace
-@rem 	3.StartUp script have to enable delayed expansion and other prohibition
-@rem 	4.Universalize to use UNICODE character set
-@rem		5.Universalize to explanation the script intent and meaning of parameter
-@rem		  what scritp accepted at scritp top unless script have not parameter
-@rem		6.Value object name start with vo_
-@rem		7.The base data type is void,int,boolean,string,vo
-@rem		8.Temporary value start with tmp_.Currently have 5 type:tmp_any,tmp_int,tmp_boolean,tmp_string,tmp_vo.
-@rem			There are four child temporary variables for each type.
-@rem
-@rem			tmp_any ---- can save any value,maybe string,maybe int or boolean,value object
-@rem					child variable:tmp_any_1,tmp_any_2,tmp_any_3,tmp_any_4
-@rem
-@rem			tmp_int ---- save int value what you want 
-@rem					child variable:tmp_int_1,tmp_int_2,tmp_any_3,tmp_any_4
-@rem
-@rem			tmp_boolean ---- save boolean value
-@rem					child variable:tmp_boolean_1,tmp_boolean_2,tmp_boolean_3,tmp_boolean_4
-@rem
-@rem			tmp_string ---- save string
-@rem 				child variable:tmp_string_1,tmp_string_2,tmp_string_3,tmp_string_4
-@rem
-@rem			tmp_vo ---- temporary value object
-@rem					child variable:tmp_vo_1,tmp_vo_2,tmp_vo_3,tmp_vo_4
-@rem 		resutl ---- This is a special tmp value,you can use it when return value
-@rem 
-@rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-@rem Initalization of install scritp,it will call approptiate core according to 
-@rem system environment.Currently it just distinguish  win 10,win 8,win 7,win vista,
-@rem and win xp system.It will call 1.0.39 version adb tool for  win 10,win 8,win 7,
-@rem ,and call 1.0.31 version adb tool for win vista and win xp system.
-
-@rem 	win 10		10.0*
-@rem	win 8		6.[23]*
-@rem	win 7		6.1.*
-@rem	win vista	6.0
-@rem	win xp		5.[1-2]
-@rem	win 2000	5.0
 
 if "%~2"=="" (
 	setlocal enableDelayedExpansion
@@ -71,13 +30,10 @@ if "%~2"=="" (
 	if "%~2"=="registPlugin" goto registPlugin
 	if "%~2"=="createNewPluginConfigFile" goto createNewPluginConfigFile
 	if "%~2"=="executeLifeCycle" goto executeLifeCycle
-	if "%~2"=="setDeviceOptSatu" goto setDeviceOptSatu
-	if "%~2"=="getDeviceOptSatu" goto getDeviceOptSatu
-	if "%~2"=="getSatuMappedName" goto getSatuMappedName
-	if "%~2"=="coreEntry" (
-		setlocal enableDelayedExpansion
-		goto coreEntry
-	)
+	if "%~2"=="setDeviceOptStatus" goto setDeviceOptStatus
+	if "%~2"=="getDeviceOptSatus" goto getDeviceOptSatus
+	if "%~2"=="getStatusMappedDescription" goto getStatusMappedDescription
+	if "%~2"=="coreEntry" goto coreEntry
 	if "%~2"=="installApp" goto installApp
 	if "%~2"=="pushFiles" goto pushFiles
 	if "%~2"=="lockScreenDirection" goto lockScreenDirection
@@ -159,13 +115,13 @@ goto eof
 	@rem 检测路径是否包含空格
 	call %~n0 boolean isPathLegitimate
 	if "!boolean!"=="false" (
-		echo 当前路径 “%~dp0” 包含空格，请将此脚本应用放到无空格的路径中再运行
-		echo 1>nul
-		echo 1>nul
-		echo 1>nul
-		echo 1>nul
-		echo 1>nul
-		echo 1>nul
+		echo 当前路径 “%~dp0” 包含空格，请将此脚本应用放到无空格的路径中再运行...
+		echo.
+		echo.
+		echo.
+		echo.
+		echo.
+		echo.
 		echo 按任意键退出
 		pause 1>nul
 		goto eof
@@ -205,10 +161,10 @@ goto eof
 		goto eof
 	)
 	call %~n0 void executeLifeCycle "onScriptFirstStart" 
-	@rem 当前正在处理的设备的序列号列表
-	set array_processing_serial=null
-	@rem 当前连接到电脑的设备序列号列表（无视状态）
-	set array_devices_serial=null
+	@rem 当前正在处理的设备的传输号列表
+	set array_processing_transport=null
+	@rem 当前连接到电脑的设备传输号列表（不管设备处于什么状态，都记录设备传输号）
+	set array_devices_transport=null
 goto eof
 
 @rem Start main loop
@@ -219,57 +175,66 @@ goto eof
 	@rem 每秒刷新连接设备列表
 	cls
 	echo ----------------------------- 当前连接状态 -----------------------------
-	set array_temp_serial=null
-	set array_devices_serial=null
+	@rem 只记录处于 device 状态的设备的传输号
+	set array_temp_transport=null
+	set array_devices_transport=null
 	set tmp_int_1=0
-	if "!array_processing_serial!" neq "null" (
-		for %%t in (!array_processing_serial!) do set /a tmp_int_1=!tmp_int_1!+1
-	) 
+	@rem 统计连接的设备数量
+	if "!array_processing_transport!" neq "null" (
+		for %%t in (!array_processing_transport!) do set /a tmp_int_1=!tmp_int_1!+1
+	)
 	echo 当前正常连接设备数量： !tmp_int_1!
 	echo ----------------------------- 当前设备列表 -----------------------------
-	adb.exe devices >%tmpdir%\devices
-	for /f "skip=1 tokens=1,2 delims=	" %%i in (%tmpdir%\devices) do (
+	echo ------------------------------------------------------------------------
+	echo	序列号		^|^|	传输号		^|^|	设备状态
+	echo ------------------------------------------------------------------------
+	adb.exe devices -l 1>%tmpdir%\devices
+	for /f "skip=1 tokens=1,2,6" %%i in (%tmpdir%\devices) do (
+		@rem 临时存设备状态
 		set tmp_string_1=null
-		if not exist "%listtmp%\%%i" (
-			call %~n0 void setDeviceOptSatu %%~i %%~j
-		) else (
-			call %~n0 string getSatuMappedName !string!
-			if "!string!"=="unauthorized" call %~n0 void setDeviceOptSatu %%~i %%~j
-			if "!string!"=="device" call %~n0 void setDeviceOptSatu %%~i %%~j
-			if "!string!"=="offline" call %~n0 void setDeviceOptSatu %%~i %%~j
+		@rem 临时存传输号
+		set tmp_string_2=null
+		@rem 临时存序列号
+		set tmp_string_3=%%~i
+		@rem 提取传输号 
+		for /f "tokens=2 delims=:" %%x in ("%%~k") do set tmp_string_2=%%~x
+		@rem 设置设备或显示设备状态
+		if not exist "%listtmp%\!tmp_string_2!" (
+			call %~n0 void setDeviceOptStatus !tmp_string_2! %%~j
 		)
-		call %~n0 string getDeviceOptSatu %%~i
-		call %~n0 string getSatuMappedName !string!
-		set tmp_string_1=!string!
-		@rem  处理实时的设备列表
-		echo %%~i	!tmp_string_1!
-		if "!array_devices_serial!" neq "null" (
-			set array_devices_serial=!array_devices_serial!,"%%~i"
+		call %~n0 void getDeviceOptSatus !tmp_string_2! tmp_any_1 tmp_string_1
+		echo	%%~i		!tmp_string_2!			!tmp_string_1!
+		@rem  实时遍历设备列表
+
+		if "!array_devices_transport!" neq "null" (
+			set array_devices_transport=!array_devices_transport!,"!tmp_string_2!"
 		) else (
-			set array_devices_serial="%%~i"
+			set array_devices_transport="!tmp_string_2!"
 		)
 		@rem 标志设备是否为新加入的设备，true 标识设备是新加入的设备，false 为正在处理中的设备，默认为 true
 		set isNew=true
+		@rem 开始判断设备是否是新连接的设备
 		if "%%~j"=="device" (
-			if "!array_temp_serial!" neq "null" (
-				set array_temp_serial=!array_temp_serial!,"%%~i"
+			if "!array_temp_transport!" neq "null" (
+				set array_temp_transport=!array_temp_transport!,"!tmp_string_2!"
 			) else (
-				set array_temp_serial="%%~i"
+				set array_temp_transport="!tmp_string_2!"
 			)
-			if "!array_processing_serial!" neq "null" (
-				for %%o in (!array_processing_serial!) do (
-					if "%%~i"=="%%~o" set isNew=false
+			if "!array_processing_transport!" neq "null" (
+				for %%o in (!array_processing_transport!) do (
+					if "!tmp_string_2!"=="%%~o" set isNew=false
 				)
-				if "!isNew!"=="true" start /min %~n0 void coreEntry %%~i
+				if "!isNew!"=="true" start /min %~n0 void coreEntry !tmp_string_3! !tmp_string_2!
 			) else (
-				start /min %~n0 void coreEntry %%~i
+				start /min %~n0 void coreEntry !tmp_string_3! !tmp_string_2!
 			)
 		)
 	)
-	set array_processing_serial=!array_temp_serial!
+	set array_processing_transport=!array_temp_transport!
+	@rem 删除不必要的状态临时文件
 	for %%i in (%listtmp%\*) do (
 		set tmp_boolean_1=false
-		for %%o in (!array_devices_serial!) do (
+		for %%o in (!array_devices_transport!) do (
 			if "%%~ni"=="%%~o" set tmp_boolean_1=true
 		)
 		if "!tmp_boolean_1!"=="false" del /f /q "%listtmp%\%%~ni"
@@ -479,7 +444,7 @@ goto eof
 							set tmp_boolean_1=true
 						)
 						if "!tmp_boolean_1!"=="false" (
-							echo 找不到插件文件 !tmp_string_1! ,该插件将不会被注册到 ”!tmp_string_2!“ 生命周期里
+							echo 找不到插件文件 !tmp_string_1! ,该插件将不会被注册到 “!tmp_string_2!” 生命周期里
 						)
 					)
 				) else (
@@ -506,7 +471,7 @@ goto eof
 @rem param_3 string Life cycle name
 @rem param_4 string Plugin name
 :registPlugin
-	echo 在生命周期 ”%~n3“ 注册插件 %~n4
+	echo 在生命周期 “%~n3” 注册插件 %~n4
 	if "!lifeCycle_%~n3!" neq "null" (
 		set lifeCycle_%~n3=!lifeCycle_%~n3!,"%~n4"
 	) else (
@@ -519,6 +484,7 @@ goto eof
 @rem return void
 :createNewPluginConfigFile
 	echo #	This is new config file without document 1>.\opt\plugin_config.txt
+	echo #	format version：0.0.3 1>.\opt\plugin_config.txt
 	echo :onScriptFirstStart 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
@@ -573,12 +539,19 @@ goto eof
 @rem 
 @rem return boolean Return false that no execute next life cycle,default is true
 @rem param_3 string Life cycle name
-@rem param_4 string Device serial
-@rem param_5 Applicathion or file absolute path 
+@rem param_4 string Device serial number
+@rem param_5 int	Device transport number
+@rem param_6 Applicathion or file absolute path 
 :executeLifeCycle
 	if "!lifeCycle_%~n3!" neq "null" (
 		for %%t in (!lifeCycle_%~n3!) do (
-			call .\opt\%%t boolean opt "%~n3" "%~n4" "%~5"
+			if "%~5" neq "" (
+				call %~n0 void setDeviceOptStatus %~4 script_running "执行插件‘%%~t’中"
+			)
+			call .\opt\%%t boolean opt "%~n3" "%~n4" "%~n5" "%~6"
+			if "%~5" neq "" (
+				call %~n0 void setDeviceOptStatus %~4 script_running
+			)
 			if "!boolean!"=="" (
 				set %~1=true
 			) else (
@@ -588,116 +561,131 @@ goto eof
 	)
 goto eof
 
-@rem Set device option satu
-@rem The option satu was:
+@rem Set device option satus
+@rem The option satus was:
 @rem 	unauthorized	未验证
 @rem	device			已连接
 @rem	offline			已离线
 @rem	script_running	脚本运行中
 @rem	complete		完成
 @rem	faild			失败
+@rem When on 'script_running' status,status description
+@rem will replace script_running to show at terminal.
+@rem
+@rem return void
+@rem param_3 string transport number
+@rem param_4 string Status
+@rem param_5 string Status description
+:setDeviceOptStatus
+	set tmp_string_4=null
+	if "%~5"=="" (
+		call %~n0 string getStatusMappedDescription %~4
+		set tmp_string_4=!string!
+	) else (
+		set tmp_string_4=%~5
+	)
+	echo "%~4":"!tmp_string_4!"1>%listtmp%\%~3
+goto eof
+
+@rem Get device option satus and atatus description
 @rem 
 @rem return void
-@rem param_3 string Serial number
-@rem param_4 string Statu
-:setDeviceOptSatu
-	echo %~4>%listtmp%\%~3
-goto eof
-
-@rem Get device option satu
-@rem 
-@rem return string Statu
-@rem param_3 string Serial number
-:getDeviceOptSatu
-	set return=null
+@rem param_3 int Transport number
+@rem param_4 string Status description use to return to
+@rem param_5 string Status description use to return to
+:getDeviceOptSatus
 	if exist "%listtmp%\%~3" (
-		set /p result=<"%listtmp%\%~3"
+		for /f "usebackq tokens=1,2 delims=:" %%i in ("%listtmp%\%~3") do (
+			set %~4=%%~i
+			set %~5=%%~j
+		)
 	)
-	set %~1=!result!
 goto eof
 
-@rem Get satu mapped name
+@rem Get status mapped description
 @rem
-@rem return string Mapped name
-@rem param_3 string statu
-:getSatuMappedName
+@rem return string Mapped description
+@rem param_3 string status
+:getStatusMappedDescription
 	set result=null
 	if "%~3" neq "" (
 		if "%~3"=="null" ( 
 			set result=正在获取状态。。。
-			goto getSatuMappedName_b_1
+			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="unauthorized" ( 
 			set result=未验证
-			goto getSatuMappedName_b_1
+			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="device" (
 			set result=已连接
-			goto getSatuMappedName_b_1
+			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="offline" (
 			set result=已离线
-			goto getSatuMappedName_b_1
+			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="script_running" (
 			set result=脚本运行中
-			goto getSatuMappedName_b_1
+			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="complete" (
 			set result=完成
-			goto getSatuMappedName_b_1
+			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="faild" (
 			set result=失败
-			goto getSatuMappedName_b_1
+			goto getStatusMappedDescription_b_1
 		)
 	)
-	:getSatuMappedName_b_1
+	:getStatusMappedDescription_b_1
 	set %~1=!result!
 goto eof
 
 @rem
 @rem return void
 @rem param_3 string Serial number
+@rem param_4 int Transport number
 :coreEntry
-	title [%~3] --- script_running
-	call %~n0 void setDeviceOptSatu %~3 script_running
-	echo ---------- 设备：%~3 ----------
-	call %~n0 boolean executeLifeCycle "onCoreStart" "%~n3"
+	setlocal enableDelayedExpansion
+	title 序列号：[%~3] ---- 传输号：[%~4] ---- script_running
+	call %~n0 void setDeviceOptStatus %~4 script_running
+	echo ---------- 设备：%~4  ----------
+	call %~n0 boolean executeLifeCycle "onCoreStart" "%~n3" "%~n4"
 	echo -------------------------------
 	if "!boolean!"=="true" (
 		echo -------------------------------
-		call %~n0 boolean executeLifeCycle "onStartInstallApp" "%~n3"
+		call %~n0 boolean executeLifeCycle "onStartInstallApp" "%~n3" "%~n4"
 		echo -------------------------------
 		if "!boolean!"=="true" (
-			call %~n0 boolean installApp %~3
-			if "!boolean!"=="false" goto faild
+			call %~n0 boolean installApp %~3 %~4
+			if "!boolean!"=="false" call %~n0 void faild "%~n3" "%~n4"
 			echo -------------------------------
-			call %~n0 boolean executeLifeCycle "onInstallAppCompleted" "%~n3"
+			call %~n0 boolean executeLifeCycle "onInstallAppCompleted" "%~n3" "%~n4"
 			echo -------------------------------
 		)
 		echo -------------------------------
-		call %~n0 boolean executeLifeCycle "onStartPushFile" "%~n3"
+		call %~n0 boolean executeLifeCycle "onStartPushFile" "%~n3" "%~n4"
 		echo -------------------------------
 		if "!boolean!"=="true" (
-			call %~n0 boolean pushFiles %~3
-			if "!boolean!"=="false" goto faild
+			call %~n0 boolean pushFiles %~3 %~4
+			if "!boolean!"=="false" call %~n0 void faild "%~n3" "%~n4"
 			echo -------------------------------
-			call %~n0 boolean executeLifeCycle "onPushFileCompleted" "%~n3"
+			call %~n0 boolean executeLifeCycle "onPushFileCompleted" "%~n3" "%~n4"
 			echo -------------------------------
 		)
 		echo -------------------------------
-		call %~n0 boolean executeLifeCycle "onCoreLogicFinish" "%~n3"
+		call %~n0 boolean executeLifeCycle "onCoreLogicFinish" "%~n3" "%~n4"
 		echo -------------------------------
 	)
 	echo -------------------------------
-	call %~n0 boolean executeLifeCycle "onCoreFinish" "%~n3"
+	call %~n0 boolean executeLifeCycle "onCoreFinish" "%~n3" "%~n4"
 	echo -------------------------------
-	call %~n0 void openSettingActivity %~3
+	call %~n0 void openSettingActivity %~4
 	echo -------------------------------
-	title [%~3] --- complete
+	title 序列号：[%~3] ---- 传输号：[%~4] ---- complete
 	color 2f
-	call %~n0 void setDeviceOptSatu %~3 complete
+	call %~n0 void setDeviceOptStatus %~4 complete
 	choice /d y /t 5 /n 1>nul
 	goto close
 goto eof
@@ -706,25 +694,28 @@ goto eof
 @rem 
 @rem return boolean If success that will return true,otherwise return false 
 @rem param_3 string Device serial number
+@rem param_4 int Device transport number
 :installApp
 	set result=true
 	set tmp_int_3=0
 	for %%t in (.\app\*.apk) do (
 		echo -------------------------------
-		call %~n0 boolean executeLifeCycle "onBeforeInstallingApp" "%~n3" "%~dp0app\%%~nxt"
+		call %~n0 boolean executeLifeCycle "onBeforeInstallingApp" "%~n3" "%~n4" "%~dp0app\%%~nxt"
 		echo -------------------------------
 		set /a tmp_int_3= !tmp_int_3! + 1
 		if "!boolean!"=="true" (
 			echo 正在安装第 !tmp_int_3! 个应用 %%~nxt 
-			adb.exe -s %~3 push ".\app\%%~nxt" "/sdcard/%%~nxt"
-			adb.exe -s %~3 shell pm install -r "/sdcard/%%~nxt"
+			call %~n0 void setDeviceOptStatus %~4 script_running "安装应用：%%~nxt"
+			adb.exe -t %~4 push ".\app\%%~nxt" "/sdcard/%%~nxt"
+			adb.exe -t %~4 shell pm install -r "/sdcard/%%~nxt"
+			call %~n0 void setDeviceOptStatus %~4 script_running
 			if %errorlevel% geq 1 (
 				echo %%~t 安装失败
 				set result=false
 				goto installApp_b_1
 			)
 			echo -------------------------------
-			call %~n0 boolean executeLifeCycle "onAfterInstallingApp" "%~n3" "%~dp0app\%%~nxt"
+			call %~n0 boolean executeLifeCycle "onAfterInstallingApp" "%~n3" "%~n4" "%~dp0app\%%~nxt"
 			echo -------------------------------
 			echo 第 !tmp_int_3! 个应用 %%~nxt 安装完成
 		) else (
@@ -739,28 +730,31 @@ goto eof
 @rem
 @rem return boolean If success to push than return true,otherwise return false
 @rem param_3 string Device serial number
+@rem param_4 int Device transport number
 :pushFiles
 	set result=true
 	set tmp_int_1=0
 	for %%t in (.\files\*) do (
 		echo -------------------------------
-		call %~n0 boolean executeLifeCycle "onBeforePushingFile" "%~n3" "%~dp0files\%%~nxt"
+		call %~n0 boolean executeLifeCycle "onBeforePushingFile" "%~n3" "%~n4" "%~dp0files\%%~nxt"
 		echo -------------------------------
 		set /a tmp_int_1= !tmp_int_1! + 1
 		if "!boolean!"=="true" (
 			echo 正在推送第 !tmp_int_1! 个文件：%%~t
-			adb.exe -s %~3 push "%%~t" "/sdcard/%%~nxt"
+			call %~n0 void setDeviceOptStatus %~4 script_running "推送文件：%%~nxt"
+			adb.exe -t %~4 push "%%~t" "/sdcard/%%~nxt"
+			call %~n0 void setDeviceOptStatus %~4 script_running
 			if %errorlevel% geq 1 (
 				echo %%~t 推送失败
 				set result=false
 				goto pushFiles_b_1
 			)
 			echo -------------------------------
-			call %~n0 boolean executeLifeCycle "onAfterPushingFile" "%~n3" "%~dp0files\%%~nxt"
+			call %~n0 boolean executeLifeCycle "onAfterPushingFile" "%~n3"  "%~n4" "%~dp0files\%%~nxt"
 			echo -------------------------------
 			echo 第 !tmp_int_1! 个文件：%%~t 推送完成
 		) else (
-			echo 跳过第 !tmp_int_1! 个文件 ’%%~t‘ 的推送
+			echo 跳过第 !tmp_int_1! 个文件 “%%~t” 的推送
 		)
 	)
 	:pushFiles_b_1
@@ -770,43 +764,44 @@ goto eof
 @rem Lock screen direction
 @rem
 @rem return void
-@rem param_3 string Device serial
+@rem param_3 int Device transport number
 :lockScreenDirection
-	adb.exe -s %~n3 shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
-	adb.exe -s %~n3 shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0
+	adb.exe -t %~3 shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:0
+	adb.exe -t %~3 shell content insert --uri content://settings/system --bind name:s:user_rotation --bind value:i:0
 goto eof
 
 @rem Unlock screen direction
 @rem
 @rem return void
-@rem param_3 string Device serial
+@rem param_3 int Device transport number
 :unlockScreenDirection
-	adb.exe -s %~3 shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
+	adb.exe -t %~3 shell content insert --uri content://settings/system --bind name:s:accelerometer_rotation --bind value:i:1
 goto eof
 
 @rem Open setting activity
 @rem 
 @rem return void
-@rem param_3 string Device serial number
+@rem param_3 int Device transport number
 :openSettingActivity
-	adb.exe -s %~3 shell am force-stop com.android.settings
-	adb.exe -s %~3 shell input keyevent KEYCODE_WAKEUP
-	adb.exe -s %~3 shell input touchscreen swipe 300 460 300 0 150
-	adb.exe -s %~3 shell am start -n com.android.settings/com.android.settings.Settings
+	adb.exe -t %~3 shell am force-stop com.android.settings
+	adb.exe -t %~3 shell input keyevent KEYCODE_WAKEUP
+	adb.exe -t %~3 shell input touchscreen swipe 300 460 300 0 150
+	adb.exe -t %~3 shell am start -n com.android.settings/com.android.settings.Settings
 goto eof
 
 @rem Script has error,than set consol mode
 @rem
 @rem return void
+@rem param_3 string Device serial number
+@rem param_4 int Device transport number
 :faild
-	title [%~3] --- faild
-	color 7f
-	call %~n0 void setDeviceOptSatu %~3 faild
+	title 序列号：[%~3] ---- 传输号：[%~4] ---- faild
+	color 47
+	call %~n0 void setDeviceOptStatus %~4 faild
 	echo -------------------------------
-	echo 稍等脚本更新状态。。。
-	echo 待屏幕恢复黑色，拔掉 USB 线几秒后再重新连接
+	echo 设备 %~3  ^(%~4^) 出现错误，请断开设备与电脑的连接，
+	echo 等待当前窗口关闭候重新将设备连接到电脑。
 	choice /d y /t 5 /n 1>nul
-	call %~n0 void setDeviceOptSatu %~3 device
 	color 0f
 	goto close
 goto eof
