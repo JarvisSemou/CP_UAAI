@@ -9,7 +9,7 @@
 @rem ::	author: Mouse.JiangWei											::
 @rem ::	date: 2020.5.12													::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+set RECEIVE_PARAM=false
 if "%~2"=="" (
 	setlocal enableDelayedExpansion
 	goto initStaticValue
@@ -40,6 +40,7 @@ if "%~2"=="" (
 	if "%~2"=="unlockScreenDirection" goto unlockScreenDirection
 	if "%~2"=="openSettingActivity" goto openSettingActivity
 	if "%~2"=="faild" goto faild
+	if "!RECEIVE_PARAM!"=="true" goto main
 goto eof
 
 :initStaticValue

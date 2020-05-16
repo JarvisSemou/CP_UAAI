@@ -81,6 +81,8 @@
 9. 脚本格式：
 
         @echo off
+        @rem 定义当前脚本启动时是否接收外部参数，true 为接收参数，false 为不接收，默认为 false
+        set RECEIVE_PARAM=false
         if "%~2"=="" (
             setlocal enableDelayedExpansion
             goto initStaticValue
@@ -91,6 +93,7 @@
             if "%~2"=="" goto main
             @rem 在这里判断方法名并跳转到相应的方法流程分支，类似上面的 goto main，例如：
             @rem if "%~2"=="close" goto close
+            if "!RECEIVE_PARAM!"=="true" goto main
         goto eof
 
         :initStaticValue
