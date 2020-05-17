@@ -82,26 +82,24 @@
 10. 脚本格式：
 
         @echo off
-        @rem 定义当前脚本启动时是否接收外部参数，true 为接收参数，false 为不接收，默认为 false
-        set RECEIVE_PARAM=false
-        if "%~2"=="" (
+        @rem 在这里面进行一些原始的只运行一次的初始化操作
+        if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+            @rem 设置是否显示调试信息，true 为显示调试信息，false 反之，默认为 false
+            set DEBUG=false
             setlocal enableDelayedExpansion
             goto initStaticValue
         )
-
+        @rem 在这里判断方法名并跳转到相应的方法流程分支
         :methodBrach
-            @rem 第二参数为空（无方法名），就进入主方法（脚本入口）
-            if "%~2"=="" goto main
-            @rem 在这里判断方法名并跳转到相应的方法流程分支，类似上面的 goto main，例如：
             @rem if "%~2"=="close" goto close
-            if "!RECEIVE_PARAM!"=="true" goto main
+            if "!DEBUG!"=="true" echo 方法 "%~2" 不存在
         goto eof
 
         :initStaticValue
             @rem 在这里初始化静态变量
             @rem 返回方法判断流程分支
             goto methodBrach
-        goto eof
+        goto main
 
         @rem 主方法（脚本入口）
         :main

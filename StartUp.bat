@@ -5,17 +5,16 @@
 @rem ::																	::
 @rem ::										Copyright: Mouse.JiangWei	::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-@rem ::	version: v2.3.0													::
+@rem ::	version: v2.3.1													::
 @rem ::	author: Mouse.JiangWei											::
-@rem ::	date: 2020.5.12													::
+@rem ::	date: 2020.5.17													::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-set RECEIVE_PARAM=false
-if "%~2"=="" (
-	setlocal enableDelayedExpansion
-	goto initStaticValue
+if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+    set DEBUG=false
+    setlocal enableDelayedExpansion
+    goto initStaticValue
 )
 :methodBrach
-	if "%~2"=="" goto main
 	if "%~2"=="initScript" goto initScript
 	if "%~2"=="startMainLoop" goto startMainLoop
 	if "%~2"=="isPathLegitimate" goto isPathLegitimate
@@ -40,7 +39,7 @@ if "%~2"=="" (
 	if "%~2"=="unlockScreenDirection" goto unlockScreenDirection
 	if "%~2"=="openSettingActivity" goto openSettingActivity
 	if "%~2"=="faild" goto faild
-	if "!RECEIVE_PARAM!"=="true" goto main
+	if "!DEBUG!"=="true" echo 方法 "%~2" 不存在
 goto eof
 
 :initStaticValue
@@ -73,8 +72,7 @@ goto eof
 	set lifeCycle_onCoreLogicFinish=null
 	@rem onCoreFinish 生命周期的插件调用链
 	set lifeCycle_onCoreFinish=null
-	goto methodBrach
-goto eof
+goto main
 
 :main
 	@rem 初始化脚本
