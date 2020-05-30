@@ -97,8 +97,6 @@
 
         :initStaticValue
             @rem 在这里初始化静态变量
-            @rem 返回方法判断流程分支
-            goto methodBrach
         goto main
 
         @rem 主方法（脚本入口）
