@@ -5,9 +5,9 @@
 @rem ::																	::
 @rem ::										Copyright: Mouse.JiangWei	::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-@rem ::	version: v2.3.1													::
+@rem ::	version: v2.3.2													::
 @rem ::	author: Mouse.JiangWei											::
-@rem ::	date: 2020.5.17													::
+@rem ::	date: 2020.11.09													::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 if "!RUN_ONCE!" neq "%RUN_ONCE%" (
     set DEBUG=false
@@ -159,7 +159,17 @@ goto eof
 		call %~n0 void printInitPluginConfigErrPage
 		goto eof
 	)
-	call %~n0 void executeLifeCycle "onScriptFirstStart" 
+	call %~n0 boolean executeLifeCycle "onScriptFirstStart" 
+	if "!boolean!"=="false" (
+		echo.
+		echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		echo.
+		echo 在初始化脚本的过程中,执行 onScriptFirstStart 生命周期遇到错误，脚本将在 5 秒后自动结束运行
+		echo.
+		echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		choice /d y /t 5 /n 1>nul
+		goto eof
+	)
 	@rem 当前正在处理的设备的传输号列表
 	set array_processing_transport=null
 	@rem 当前连接到电脑的设备传输号列表（不管设备处于什么状态，都记录设备传输号）
