@@ -464,7 +464,7 @@ goto eof
 				)
 			) else (
 				set result=false
-				echo 检测 "!tmp_string_1!" 行开头存在空格，脚本将停止解析插件配置文件并退出
+				echo 检测到 "!tmp_string_1!" 行开头存在空格，脚本将停止解析插件配置文件并退出
 				pause 1>nul
 				goto initPluginConfig_b_1
 			)
