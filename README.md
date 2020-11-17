@@ -84,10 +84,46 @@
         @echo off
         @rem 在这里面进行一些原始的只运行一次的初始化操作
         if "!RUN_ONCE!" neq "%RUN_ONCE%" (
-            @rem 设置是否显示调试信息，true 为显示调试信息，false 反之，默认为 false
-            set DEBUG=false
-            setlocal enableDelayedExpansion
-            goto initStaticValue
+            for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%') do (
+                @rem 设置是否显示调试信息，true 为显示调试信息，false 反之，默认为 false
+                set DEBUG=false
+                if "%%s"=="" (
+                    @rem 不开延时变量，需要明确调用 main 方法才能进入 main 方法
+                    if "%~2" neq "main" goto debugPoint else goto initStaticValue
+                )
+                @rem 开两层局部变量扩展保护 path 变量,path 在局部变量扩展下不受空格影响
+                setlocal enableDelayedExpansion
+                set path=%~dp0;!path!
+                setlocal enableDelayedExpansion
+                if "%%s"=="/K" (
+                    @rem void 为异步调用一个方法，否则异步执行脚本
+                    if "%~1" neq "void" goto initStaticValue else goto debugPoint
+                )
+                if "%%s"=="/c" (
+                    @rem 直接启动脚本，正常初始化
+                    goto initStaticValue
+                )
+            )
+        ) else (
+            @rem 已开延时变量 call main 方法
+            if "%~2"=="main" goto initStaticValue
+        )
+        :debugPoint
+        if "%DEBUG%"=="true"(
+            echo 当前指令：
+            echo %cmdcmdline% 
+            echo.
+            echo 当前参数：
+            echo 参数 0：%0 参数 1：%1  参数 2：%2  参数 3：%3  参数 4：%4
+            echo 参数 5：%5 参数 6：%6  参数 7：%7  参数 8：%8  参数 9：%9
+            echo.
+            if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+                echo 当前延时变量状态：延迟变量未开启
+            ) else (
+                echo 当前延时变量状态：延迟变量已开启
+            )
+            echo 按任意键继续运行 --------------------》
+            pause 1>nul
         )
         @rem 在这里判断方法名并跳转到相应的方法流程分支
         :methodBrach
@@ -112,6 +148,15 @@
         :eof
 
 ## 更新历史
+
+---
+
+### 2.3.2
+
+1. 更新脚本的启动方式，支持直接启动、call 调用（继承父脚本的延迟变量的打开状态）、start 调用（默认打开延迟变量）
+2. 更新示例插件模板
+3. 更新插件配置文件说明
+4. 将插件路径添加到 path 变量中
 
 ---
 

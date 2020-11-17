@@ -1,8 +1,8 @@
 @echo off
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-@rem ::	version: v0.0.4													::
+@rem ::	version: v0.0.5													::
 @rem ::	author: Mouse.JiangWei											::
-@rem ::	date: 2020.5.17													::
+@rem ::	date: 2020.11.10													::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @rem 插件名称：模板插件
 @rem 插件版本：0.0.2
@@ -14,9 +14,33 @@
 @rem 	耗时 150 毫秒，然后打开系统设置界面
 @rem 	2、取消往所有设备推送 files 目录下所有文件的逻辑
 @rem ---------------------------------------------------------------------
-@rem 注：以后将使用传输号代替序列号识别不同设备
+@rem 注：
+@rem 	1、以后将使用传输号代替序列号识别不同设备
+@rem	2、onScriptFirstStart 只接收 param_3 参数
+@rem 	3、只有 onBeforeInstallingApp、onAfterInstallingApp、onBeforePushingFile、
+@rem		onAfterPushingFile 能接收到 param_6 参数
 @rem ---------------------------------------------------------------------
-if "!RUN_ONCE!" neq "%RUN_ONCE%" setlocal enableDelayedExpansion
+if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+	set DEBUG=false
+	setlocal enableDelayedExpansion
+	set path=%~dp0;%path%
+)
+if "%DEBUG%"=="true" (
+	echo 当前指令：
+	echo %cmdcmdline% 
+	echo.
+	echo 当前参数：
+	echo 参数 0：%0	参数 1：%1	参数 2：%2	参数 3：%3	参数 4：%4
+	echo 参数 5：%5	参数 6：%6	参数 7：%7	参数 8：%8	参数 9：%9
+	echo.
+	if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+		echo 当前延时变量状态：延迟变量未开启
+	) else (
+		echo 当前延时变量状态：延迟变量已开启
+	)
+	echo 按任意键继续运行 --------------------》
+	pause 1>nul
+)
 if "%~2"=="opt" goto opt
 goto eof
 

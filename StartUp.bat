@@ -10,10 +10,47 @@
 @rem ::	date: 2020.11.09													::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 if "!RUN_ONCE!" neq "%RUN_ONCE%" (
-    set DEBUG=false
-    setlocal enableDelayedExpansion
-    goto initStaticValue
+	for /f "tokens=1,2 delims= " %%r in ('echo %CMDCMDLINE%') do (
+		@rem 设置是否显示调试信息，true 为显示调试信息，false 反之，默认为 false
+        set DEBUG=false
+		if "%%s"=="" (
+			@rem 不开延时变量，需要明确调用 main 方法才能进入 main 方法
+			if "%~2" neq "main" goto debugPoint else goto initStaticValue
+		)
+		@rem 开两层局部变量扩展保护 path 变量,path 在局部变量扩展下不受空格影响
+		setlocal enableDelayedExpansion
+		set path=%~dp0;!path!
+		setlocal enableDelayedExpansion
+		if "%%s"=="/K" (
+			@rem void 为异步调用一个方法，否则异步执行脚本
+			if "%~1" neq "void" goto initStaticValue else goto debugPoint
+		)
+    	if "%%s"=="/c" (
+			@rem 直接启动脚本，正常初始化
+			goto initStaticValue
+		)
+	)
+) else (
+	@rem 已开延时变量 call main 方法
+	if "%~2"=="main" goto initStaticValue
 )
+:debugPoint
+if "%DEBUG%"=="true" (
+	echo 当前指令：
+	echo %cmdcmdline% 
+	echo.
+	echo 当前参数：
+	echo 参数 0：%0	参数 1：%1	参数 2：%2	参数 3：%3	参数 4：%4
+	echo 参数 5：%5	参数 6：%6	参数 7：%7	参数 8：%8	参数 9：%9
+	echo.
+	if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+		echo 当前延时变量状态：延迟变量未开启
+	) else (
+		echo 当前延时变量状态：延迟变量已开启
+	)
+	echo 按任意键继续运行 --------------------》
+	pause 1>nul
+) 
 :methodBrach
 	if "%~2"=="initScript" goto initScript
 	if "%~2"=="startMainLoop" goto startMainLoop
@@ -44,8 +81,6 @@ goto eof
 
 :initStaticValue
 	@rem 当前工作根路径
-	set rootPath=%~dp0
-	set path=%rootpath%bin;!path!
 	set tmpdir=%temp%\tmpdir
 	set listtmp=%tmpdir%\list
 	@rem onScriptFirstStart 生命周期的插件调用链
@@ -110,7 +145,10 @@ goto eof
 	echo                                                                                      @
 	echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 	echo 脚本启动中。。。
-	cd /d %rootPath%
+	choice /d y /t 2 /n 1>nul
+	cd /d %~dp0
+	set path=%~dp0bin;!path!
+	set path=%~dp0opt;!path!
 	@rem 检测路径是否包含空格
 	call %~n0 boolean isPathLegitimate
 	if "!boolean!"=="false" (
@@ -159,14 +197,15 @@ goto eof
 		call %~n0 void printInitPluginConfigErrPage
 		goto eof
 	)
+	echo 插件初始化完成
 	call %~n0 boolean executeLifeCycle "onScriptFirstStart" 
 	if "!boolean!"=="false" (
 		echo.
-		echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		echo ---------------------------------------------------------------------------
 		echo.
 		echo 在初始化脚本的过程中,执行 onScriptFirstStart 生命周期遇到错误，脚本将在 5 秒后自动结束运行
 		echo.
-		echo !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		echo ---------------------------------------------------------------------------
 		choice /d y /t 5 /n 1>nul
 		goto eof
 	)
@@ -462,12 +501,7 @@ goto eof
 					pause 1>nul
 					goto initPluginConfig_b_1
 				)
-			) else (
-				set result=false
-				echo 检测到 "!tmp_string_1!" 行开头存在空格，脚本将停止解析插件配置文件并退出
-				pause 1>nul
-				goto initPluginConfig_b_1
-			)
+			) 
 		)
 	)
 	:initPluginConfig_b_1
@@ -550,12 +584,12 @@ goto eof
 @rem param_3 string Life cycle name
 @rem param_4 string Device serial number
 @rem param_5 int	Device transport number
-@rem param_6 Applicathion or file absolute path 
+@rem param_6 string Applicathion or file absolute path 
 :executeLifeCycle
 	if "!lifeCycle_%~n3!" neq "null" (
 		for %%t in (!lifeCycle_%~n3!) do (
 			if "%~5" neq "" (
-				call %~n0 void setDeviceOptStatus %~4 script_running "执行插件‘%%~t’中"
+				call %~n0 void setDeviceOptStatus %~5 script_running "执行插件‘%%~t’中"
 			)
 			call .\opt\%%t boolean opt "%~n3" "%~n4" "%~n5" "%~6"
 			if "%~5" neq "" (
