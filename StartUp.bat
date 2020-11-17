@@ -750,7 +750,7 @@ goto eof
 			echo 正在安装第 !tmp_int_3! 个应用 %%~nxt 
 			call %~n0 void setDeviceOptStatus %~4 script_running "安装应用：%%~nxt"
 			adb.exe -t %~4 push ".\app\%%~nxt" "/sdcard/%%~nxt"
-			adb.exe -t %~4 shell pm install -r "/sdcard/%%~nxt"
+			adb.exe -t %~4 shell pm install -t -r "/sdcard/%%~nxt"
 			call %~n0 void setDeviceOptStatus %~4 script_running
 			if %errorlevel% geq 1 (
 				echo %%~t 安装失败
