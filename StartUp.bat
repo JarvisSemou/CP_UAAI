@@ -601,6 +601,8 @@ goto eof
 				set %~1=!boolean!
 			)
 		)
+	) else (
+		set %~1=true
 	)
 goto eof
 
@@ -750,13 +752,8 @@ goto eof
 			echo 正在安装第 !tmp_int_3! 个应用 %%~nxt 
 			call %~n0 void setDeviceOptStatus %~4 script_running "安装应用：%%~nxt"
 			adb.exe -t %~4 push ".\app\%%~nxt" "/sdcard/%%~nxt"
-			adb.exe -t %~4 shell pm install -t -r "/sdcard/%%~nxt"
+			adb.exe -t %~4 install -t -r ".\app\%%~nxt"
 			call %~n0 void setDeviceOptStatus %~4 script_running
-			if %errorlevel% geq 1 (
-				echo %%~t 安装失败
-				set result=false
-				goto installApp_b_1
-			)
 			echo -------------------------------
 			call %~n0 boolean executeLifeCycle "onAfterInstallingApp" "%~n3" "%~n4" "%~dp0app\%%~nxt"
 			echo -------------------------------
@@ -765,7 +762,6 @@ goto eof
 			echo 跳过第 !tmp_int_3! 个应用的安装
 		)
 	)
-	:installApp_b_1
 	set %~1=!result!
 goto eof
 
