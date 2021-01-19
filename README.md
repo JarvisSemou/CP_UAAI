@@ -109,7 +109,7 @@
             if "%~2"=="main" goto initStaticValue
         )
         :debugPoint
-        if "%DEBUG%"=="true"(
+        if "%DEBUG%"=="true" (
             echo 当前指令：
             echo %cmdcmdline% 
             echo.
