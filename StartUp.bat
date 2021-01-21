@@ -19,6 +19,8 @@ set INHERIT_DELAYED_EXPANSION_STATE=false
 set DEFAULT_ENTER_MAIN=false
 @rem 配置 start 调用 脚本方法 时，是否默认进入 main 方法，true 为默认进入，false 反之，默认为 false
 set DEFAULT_ENTER_START_MAIN=false
+@rem 配置在无匹配的方法时，默认运行的方法，填写 null 将不会调用任何方法，默认值为 null
+set DEFAULT_METHOD=null
 @rem 配置是否允许在已开启延时变量的情况下主动通过 call 调用 main 方法，true 为允许，false 反之，默认为 false
 @rem 注：开启后可能会造成死递归
 set FORCE_ENTER_MAIN_WITH_DELAYED_EXPANSION=false
@@ -93,6 +95,7 @@ goto afterMethodBrach
         @rem call、直接或非第一次 start 方式调用脚本方法
         if "%DEFAULT_ENTER_MAIN%"=="true" goto beforeMain
     )
+	if "%DEFAULT_METHOD%" neq "null" goto %DEFAULT_METHOD%
     if "%DEBUG%"=="true" echo 方法 %~2 不存在
 @rem ----------------------------------------------------------------
 goto eof
