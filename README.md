@@ -26,12 +26,12 @@
 |生命周期|生命周期作用|
 |:-:|:-|
 | onScriptFirstStart | 在脚本初始化完成，且还没开始循环执行业务逻辑时被调用，只会执行一次|
-|onCoreStart|在开始执行业务逻辑时被调用，对于每台设备只会执行一次,可通过返回 `false` 阻止这些生命周期执行：  `onStartInstallApp`  `onBeforeInstallingApp`  `onAfterInstallingApp`  `onInstallAppCompleted`  `onStartPushFile`  `onBeforePushingFile`  `onAfterPushingFile`  `onPushFileCompleted`  `onCoreLogicFinish`|
-| onStartInstallApp | 在开始执行应用安装逻辑时执行一次，可以通过返回 `false` 阻止整个应用安装生命周期，即：  `onBeforeInstallingApp`  `onAfterInstallingApp`  `onInstallAppCompleted`|
+|onCoreStart|在开始执行业务逻辑时被调用，对于每台设备只会执行一次,可通过返回 `false` 阻止这些生命周期执行：  `onStartInstallApp `<br/>`onBeforeInstallingApp `<br/>`onAfterInstallingApp `<br/>`onInstallAppCompleted `<br/>`onStartPushFile `<br/>`onBeforePushingFile `<br/>`onAfterPushingFile `<br/>`onPushFileCompleted `<br/>`onCoreLogicFinish`|
+| onStartInstallApp | 在开始执行应用安装逻辑时执行一次，可以通过返回 `false` 阻止整个应用安装生命周期，即：  `onBeforeInstallingApp `<br/>`onAfterInstallingApp `<br/>`onInstallAppCompleted`|
 | onBeforeInstallingApp | 在开始安装一个应用前被调用，每迭代到 `.\app` 目录下的一个应用的时候就调用一次，对于每台设备一般会被多次调用，可以通过返回 false 跳过当前应用的安装，但不会阻止应用安装逻辑，会阻止 `onAfterInstallingApp` 生命周期的执行|
 | onAfterInstallingApp | 在结束安装一个应用的安装时被调用，可以被 `onBeforeInstallingApp` 生命周期阻止执行。只在当前应用安装完成后被调用，对于每台设备一般会多次调用|
 | onInstallAppCompleted | 在结束应用安装逻辑后被调用，对于每台设备只会被调用一次|
-| onStartPushFile | 在开始执行文件推送逻辑时执行一次，可以通过返回 `false` 阻止整个文件推送逻辑生命周期，即：  `onBeforePushingFile`  `onAfterPushingFile`  `onPushFileCompleted`|
+| onStartPushFile | 在开始执行文件推送逻辑时执行一次，可以通过返回 `false` 阻止整个文件推送逻辑生命周期，即：  `onBeforePushingFile `<br/>`onAfterPushingFile `<br/>`onPushFileCompleted`|
 | onBeforePushingFile | 在开始推送一个文件时被调用，每迭代到 `.\files` 目录下的一个文件的时候就调用一次，对于每台设备一般会被多次调用，可以通过返回 `false` 跳过当前文件的推送，但不会阻止文件推送逻辑，会阻止 `onAfterPushingFile` 生命周期的执行|
 | onAfterPushingFile | 在结束推送一个文件的推送时被调用，可以被 `onBeforeInstallingApp` 生命周期阻止执行。只在当前文件推送完成后被调用，对于每台设备一般会多次调用|
 | onPushFileCompleted | 在结束文件推送逻辑后被调用，对于每台设备只会被调用一次|
@@ -153,7 +153,7 @@
             if "%DEBUG%"=="true" echo 方法 %~2 不存在
         @rem ----------------------------------------------------------------
         goto eof
-        
+
         @rem 控制是否可以进入 main 方法
         :beforeMain
         @rem ----------------------------------------------------------------
