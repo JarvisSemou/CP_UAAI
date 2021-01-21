@@ -26,12 +26,12 @@
 |生命周期|生命周期作用|
 |:-:|:-|
 | onScriptFirstStart | 在脚本初始化完成，且还没开始循环执行业务逻辑时被调用，只会执行一次|
-|onCoreStart|在开始执行业务逻辑时被调用，对于每台设备只会执行一次,可通过返回 `false` 阻止这些生命周期执行：<br/>`onStartInstallApp`<br/>`onBeforeInstallingApp`<br/>`onAfterInstallingApp`<br/>`onInstallAppCompleted`<br/>`onStartPushFile`<br/>`onBeforePushingFile`<br/>`onAfterPushingFile`<br/>`onPushFileCompleted`<br/>`onCoreLogicFinish`|
-| onStartInstallApp | 在开始执行应用安装逻辑时执行一次，可以通过返回 `false` 阻止整个应用安装生命周期，即：<br/>`onBeforeInstallingApp`<br/>`onAfterInstallingApp`<br/>`onInstallAppCompleted`|
+|onCoreStart|在开始执行业务逻辑时被调用，对于每台设备只会执行一次,可通过返回 `false` 阻止这些生命周期执行：  `onStartInstallApp`  `onBeforeInstallingApp`  `onAfterInstallingApp`  `onInstallAppCompleted`  `onStartPushFile`  `onBeforePushingFile`  `onAfterPushingFile`  `onPushFileCompleted`  `onCoreLogicFinish`|
+| onStartInstallApp | 在开始执行应用安装逻辑时执行一次，可以通过返回 `false` 阻止整个应用安装生命周期，即：  `onBeforeInstallingApp`  `onAfterInstallingApp`  `onInstallAppCompleted`|
 | onBeforeInstallingApp | 在开始安装一个应用前被调用，每迭代到 `.\app` 目录下的一个应用的时候就调用一次，对于每台设备一般会被多次调用，可以通过返回 false 跳过当前应用的安装，但不会阻止应用安装逻辑，会阻止 `onAfterInstallingApp` 生命周期的执行|
 | onAfterInstallingApp | 在结束安装一个应用的安装时被调用，可以被 `onBeforeInstallingApp` 生命周期阻止执行。只在当前应用安装完成后被调用，对于每台设备一般会多次调用|
 | onInstallAppCompleted | 在结束应用安装逻辑后被调用，对于每台设备只会被调用一次|
-| onStartPushFile | 在开始执行文件推送逻辑时执行一次，可以通过返回 `false` 阻止整个文件推送逻辑生命周期，即：<br/>`onBeforePushingFile`<br/>`onAfterPushingFile`<br/>`onPushFileCompleted`|
+| onStartPushFile | 在开始执行文件推送逻辑时执行一次，可以通过返回 `false` 阻止整个文件推送逻辑生命周期，即：  `onBeforePushingFile`  `onAfterPushingFile`  `onPushFileCompleted`|
 | onBeforePushingFile | 在开始推送一个文件时被调用，每迭代到 `.\files` 目录下的一个文件的时候就调用一次，对于每台设备一般会被多次调用，可以通过返回 `false` 跳过当前文件的推送，但不会阻止文件推送逻辑，会阻止 `onAfterPushingFile` 生命周期的执行|
 | onAfterPushingFile | 在结束推送一个文件的推送时被调用，可以被 `onBeforeInstallingApp` 生命周期阻止执行。只在当前文件推送完成后被调用，对于每台设备一般会多次调用|
 | onPushFileCompleted | 在结束文件推送逻辑后被调用，对于每台设备只会被调用一次|
@@ -41,7 +41,7 @@
 ## **一些开发规则**
 
 1. 基本变量类型有 `void`、`int`、`boolean`、`string`、`vo` （Value Object，单纯的数据类型，以 “vo_” 开头），除了 `void` 不用写默认值外，其他基本类型的默认值不做特别约束。
-2. 临时变量的变量名以 “tmp_” 开头。当前有 6 种临时变量：`tmp_any`、`tmp_int`、`tmp_boolean`、`tmp_string`、`tmp_vo`、`result`。<br/>除了 `result`，每种临时变量又有 4 个子临时变量，以下是每种临时变量的说明：
+2. 临时变量的变量名以 “tmp_” 开头。当前有 6 种临时变量：`tmp_any`、`tmp_int`、`tmp_boolean`、`tmp_string`、`tmp_vo`、`result`。  除了 `result`，每种临时变量又有 4 个子临时变量，以下是每种临时变量的说明：
     - tmp_any ：能存任意值，可能是 string，可能是 int 或 boolean，vo
         - 子变量：tmp_any_1、tmp_any_2、tmp_any_3、tmp_any_4
     - tmp_int ：存储你想要的数值
@@ -54,15 +54,16 @@
         - 子变量：tmp_vo_1、tmp_vo_2、tmp_vo_3、tmp_vo_4
     - result ：这是指定用来临时存储返回值的临时变量
 3. 自定义的变量的变量名采用 camel 命名法；数组变量以“array”开头，且变量名中单词用下划线分隔开，单词统一用小写字母。
-4. 数组元素用英文逗号分隔，元素必须用英文双引号括住。<br/>例如：在数组“array_myList”中，里面的元素这样存储：`"item_1","item_2","item_3",...,"item_n"`。当数组没有元素时，值为不加双引号的“`null`”。
+4. 数组元素用英文逗号分隔，元素必须用英文双引号括住。  例如：在数组“array_myList”中，里面的元素这样存储：`"item_1","item_2","item_3",...,"item_n"`。当数组没有元素时，值为不加双引号的“`null`”。
 5. 脚本必须打开延迟变量开关（`setlocal enableDelayedExpansion`）。
-6. 统一使用 `GB2312` 字符集。
+6. 统一使用 `UTF-8` 字符集。
 7. 注释格式统一用 “`@rem 注释内容`”
 8. 方法内部标签格式：
     - `:方法名_b_编号`  用于作为流程中断时跳转的目标
     - `:方法名_l_编号`  用于作为普通流程中的跳转目标
 9. 方法格式：
 
+    ```batch
         @rem 方法描述
         @rem
         @rem return 返回类型   对返回的数据的描述
@@ -78,37 +79,29 @@
             set %~1=!result!
         @rem 方法结束
         goto eof
+    ```
 
 10. 脚本格式：
 
+    ```batch
         @echo off
-        @rem 在这里面进行一些原始的只运行一次的初始化操作
-        if "!RUN_ONCE!" neq "%RUN_ONCE%" (
-            for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%') do (
-                @rem 设置是否显示调试信息，true 为显示调试信息，false 反之，默认为 false
-                set DEBUG=false
-                if "%%s"=="" (
-                    @rem 不开延时变量，需要明确调用 main 方法才能进入 main 方法
-                    if "%~2" neq "main" goto debugPoint else goto initStaticValue
-                )
-                @rem 开两层局部变量扩展保护 path 变量,path 在局部变量扩展下不受空格影响
-                setlocal enableDelayedExpansion
-                set path=%~dp0;!path!
-                setlocal enableDelayedExpansion
-                if "%%s"=="/K" (
-                    @rem void 为异步调用一个方法，否则异步执行脚本
-                    if "%~1" neq "void" goto initStaticValue else goto debugPoint
-                )
-                if "%%s"=="/c" (
-                    @rem 直接启动脚本，正常初始化
-                    goto initStaticValue
-                )
-            )
-        ) else (
-            @rem 已开延时变量 call main 方法
-            if "%~2"=="main" goto initStaticValue
-        )
-        :debugPoint
+        chcp 65001 1>nul
+        @rem ==============================================================
+        @rem 配置调试信息显示，true 为显示调试信息，false 反之，默认为 false
+        set DEBUG=false
+        @rem 配置 call 或命令行调用 main 方法时是否继承父进程的延时变量状态，true 为继承，false 反之，默认为 false
+        @rem 注：当值为 false 时，此常量的设置可以被 FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION 常量覆盖
+        set INHERIT_DELAYED_EXPANSION_STATE=false
+        @rem 配置 call 或命令行调用 脚本方法 时，是否默认进入 mian 方法，true 为默认进入，false 反之，默认为 false
+        set DEFAULT_ENTER_MAIN=false
+        @rem 配置 start 调用 脚本方法 时，是否默认进入 main 方法，true 为默认进入，false 反之，默认为 false
+        set DEFAULT_ENTER_START_MAIN=false
+        @rem 配置是否允许在已开启延时变量的情况下主动通过 call 调用 main 方法，true 为允许，false 反之，默认为 false
+        @rem 注：开启后可能会造成死递归
+        set FORCE_ENTER_MAIN_WITH_DELAYED_EXPANSION=false
+        @rem 配置 call 重复进入 main 方法时，是否开启新的延时变量拓展（用来隔离变量），true 为开启，false 反之，默认为 false
+        set FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION=false
+        @rem ==============================================================
         if "%DEBUG%"=="true" (
             echo 当前指令：
             echo %cmdcmdline% 
@@ -125,11 +118,82 @@
             echo 按任意键继续运行 --------------------》
             pause 1>nul
         )
+        @rem ==============================================================
+        @rem 根据第一个参数判断脚本的启动方式（调用方法或启动脚本）。
+        @rem %~1 为 void、int、boolean、string、vo 时认为是调用方法，否则是启动脚本。
+        if "%~1"=="void" goto methodBrach
+        if "%~1"=="int" goto methodBrach
+        if "%~1"=="boolean" goto methodBrach
+        if "%~1"=="string" goto methodBrach
+        if "%~1"=="vo" goto methodBrach
+        goto beforeMain
+
         @rem 在这里判断方法名并跳转到相应的方法流程分支
         :methodBrach
             @rem if "%~2"=="close" goto close
-            if "!DEBUG!"=="true" echo 方法 "%~2" 不存在
+
+        goto afterMethodBrach
+
+        @rem 控制默认进入 main 方法
+        :afterMethodBrach
+        @rem ----------------------------------------------------------------
+            @rem 尝试进入显式调用的 main 方法
+            if "%~2"=="main" goto beforeMain
+            @rem 判断是否默认进入 main 方法
+            for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%') do (
+                if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+                    @rem 脚本方法以 start 方式调用（第一次启动）
+                    if "%%s"=="/K" (
+                        if "%DEFAULT_ENTER_START_MAIN%"=="true" goto beforeMain
+                    )
+                )
+                @rem call、直接或非第一次 start 方式调用脚本方法
+                if "%DEFAULT_ENTER_MAIN%"=="true" goto beforeMain
+            )
+            if "%DEBUG%"=="true" echo 方法 %~2 不存在
+        @rem ----------------------------------------------------------------
         goto eof
+        
+        @rem 控制是否可以进入 main 方法
+        :beforeMain
+        @rem ----------------------------------------------------------------
+            if "%FORCE_ENTER_MAIN_WITH_DELAYED_EXPANSION%"=="false" (
+                if "!RUN_ONCE!"=="%RUN_ONCE%" (
+                    if "%DEBUG%"=="true" echo 延时变量已启用，已禁止重复进入 main 方法
+                    goto eof
+                )
+            )
+        @rem ----------------------------------------------------------------
+        @rem 进入 main 方法前开两层局部变量扩展保护 path 变量，第一层确保能用 !path!,
+        @rem 使 path 不受空格影响，第二层保护 path 变量。
+            for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%') do (
+                if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+                    @rem 对于第一次 start 方式和直接启动脚本，总是打开延时变量
+                    if "%%s"=="/K" goto beforeMain_l_1
+                    if "%%s"=="/c" goto beforeMain_l_1
+                )
+                @rem 对于第一次的 call 和非第一次的 call、start、直接地调用脚本，根据配置设置延时变量状态
+                if "%INHERIT_DELAYED_EXPANSION_STATE%"=="true" (
+                    @rem 继承延时变量状态
+                    goto beforeMain_l_2
+                ) else (
+                    @rem 不继承延时变量状态，如果是第一次启动，就打开延时变量扩展保护
+                    if "!RUN_ONCE!"=="%RUN_ONCE%" (
+                        @rem 根据配置强制每次都开启延时变量拓展保护
+                        if "%FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION%"=="true" goto beforeMain_l_1
+                        goto beforeMain_l_2
+                    ) else (
+                        goto beforeMain_l_1
+                    )
+                )
+            )
+            :beforeMain_l_1
+            setlocal enableDelayedExpansion
+            set path=%~dp0;!path!
+            setlocal enableDelayedExpansion
+            :beforeMain_l_2
+        @rem ----------------------------------------------------------------
+        goto initStaticValue
 
         :initStaticValue
             @rem 在这里初始化静态变量
@@ -146,8 +210,16 @@
 
         @rem 脚本出口
         :eof
+    ```
 
 ## 更新历史
+
+---
+
+### 2.4.0
+
+1. 主脚本和插件同一使用新的启动逻辑
+2. 脚本整体转换文件编码为 UTF-8 格式
 
 ---
 
