@@ -1,56 +1,57 @@
 @echo off
+chcp 65001 1>nul
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 @rem ::																	::
 @rem ::		  					CP_UAAI									::
 @rem ::																	::
 @rem ::										Copyright: Mouse.JiangWei	::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-@rem ::	version: v2.3.2													::
+@rem ::	version: v2.4.0													::
 @rem ::	author: Mouse.JiangWei											::
-@rem ::	date: 2020.11.09													::
+@rem ::	date: 2021.01.21													::
 @rem ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-if "!RUN_ONCE!" neq "%RUN_ONCE%" (
-	for /f "tokens=1,2 delims= " %%r in ('echo %CMDCMDLINE%') do (
-		@rem ÉèÖÃÊÇ·ñÏÔÊ¾µ÷ÊÔÐÅÏ¢£¬true ÎªÏÔÊ¾µ÷ÊÔÐÅÏ¢£¬false ·´Ö®£¬Ä¬ÈÏÎª false
-        set DEBUG=false
-		if "%%s"=="" (
-			@rem ²»¿ªÑÓÊ±±äÁ¿£¬ÐèÒªÃ÷È·µ÷ÓÃ main ·½·¨²ÅÄÜ½øÈë main ·½·¨
-			if "%~2" neq "main" goto debugPoint else goto initStaticValue
-		)
-		@rem ¿ªÁ½²ã¾Ö²¿±äÁ¿À©Õ¹±£»¤ path ±äÁ¿,path ÔÚ¾Ö²¿±äÁ¿À©Õ¹ÏÂ²»ÊÜ¿Õ¸ñÓ°Ïì
-		setlocal enableDelayedExpansion
-		set path=%~dp0;!path!
-		setlocal enableDelayedExpansion
-		if "%%s"=="/K" (
-			@rem void ÎªÒì²½µ÷ÓÃÒ»¸ö·½·¨£¬·ñÔòÒì²½Ö´ÐÐ½Å±¾
-			if "%~1" neq "void" goto initStaticValue else goto debugPoint
-		)
-    	if "%%s"=="/c" (
-			@rem Ö±½ÓÆô¶¯½Å±¾£¬Õý³£³õÊ¼»¯
-			goto initStaticValue
-		)
-	)
-) else (
-	@rem ÒÑ¿ªÑÓÊ±±äÁ¿ call main ·½·¨
-	if "%~2"=="main" goto initStaticValue
-)
-:debugPoint
+@rem ==============================================================
+@rem é…ç½®è°ƒè¯•ä¿¡æ¯æ˜¾ç¤ºï¼Œtrue ä¸ºæ˜¾ç¤ºè°ƒè¯•ä¿¡æ¯ï¼Œfalse åä¹‹ï¼Œé»˜è®¤ä¸º false
+set DEBUG=false
+@rem é…ç½® call æˆ–å‘½ä»¤è¡Œè°ƒç”¨ main æ–¹æ³•æ—¶æ˜¯å¦ç»§æ‰¿çˆ¶è¿›ç¨‹çš„å»¶æ—¶å˜é‡çŠ¶æ€ï¼Œtrue ä¸ºç»§æ‰¿ï¼Œfalse åä¹‹ï¼Œé»˜è®¤ä¸º true
+@rem æ³¨ï¼šå½“å€¼ä¸º false æ—¶ï¼Œæ­¤å¸¸é‡çš„è®¾ç½®å¯ä»¥è¢« FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION å¸¸é‡è¦†ç›–
+set INHERIT_DELAYED_EXPANSION_STATE=true
+@rem é…ç½® call æˆ–å‘½ä»¤è¡Œè°ƒç”¨ è„šæœ¬æ–¹æ³• æ—¶ï¼Œæ˜¯å¦é»˜è®¤è¿›å…¥ mian æ–¹æ³•ï¼Œtrue ä¸ºé»˜è®¤è¿›å…¥ï¼Œfalse åä¹‹ï¼Œé»˜è®¤ä¸º false
+set DEFAULT_ENTER_MAIN=false
+@rem é…ç½® start è°ƒç”¨ è„šæœ¬æ–¹æ³• æ—¶ï¼Œæ˜¯å¦é»˜è®¤è¿›å…¥ main æ–¹æ³•ï¼Œtrue ä¸ºé»˜è®¤è¿›å…¥ï¼Œfalse åä¹‹ï¼Œé»˜è®¤ä¸º false
+set DEFAULT_ENTER_START_MAIN=false
+@rem é…ç½®æ˜¯å¦å…è®¸åœ¨å·²å¼€å¯å»¶æ—¶å˜é‡çš„æƒ…å†µä¸‹ä¸»åŠ¨é€šè¿‡ call è°ƒç”¨ main æ–¹æ³•ï¼Œtrue ä¸ºå…è®¸ï¼Œfalse åä¹‹ï¼Œé»˜è®¤ä¸º false
+@rem æ³¨ï¼šå¼€å¯åŽå¯èƒ½ä¼šé€ æˆæ­»é€’å½’
+set FORCE_ENTER_MAIN_WITH_DELAYED_EXPANSION=false
+@rem é…ç½® call é‡å¤è¿›å…¥ main æ–¹æ³•æ—¶ï¼Œæ˜¯å¦å¼€å¯æ–°çš„å»¶æ—¶å˜é‡æ‹“å±•ï¼ˆç”¨æ¥éš”ç¦»å˜é‡ï¼‰ï¼Œtrue ä¸ºå¼€å¯ï¼Œfalse åä¹‹ï¼Œé»˜è®¤ä¸º false
+set FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION=false
+@rem ==============================================================
 if "%DEBUG%"=="true" (
-	echo µ±Ç°Ö¸Áî£º
-	echo %cmdcmdline% 
-	echo.
-	echo µ±Ç°²ÎÊý£º
-	echo ²ÎÊý 0£º%0	²ÎÊý 1£º%1	²ÎÊý 2£º%2	²ÎÊý 3£º%3	²ÎÊý 4£º%4
-	echo ²ÎÊý 5£º%5	²ÎÊý 6£º%6	²ÎÊý 7£º%7	²ÎÊý 8£º%8	²ÎÊý 9£º%9
-	echo.
-	if "!RUN_ONCE!" neq "%RUN_ONCE%" (
-		echo µ±Ç°ÑÓÊ±±äÁ¿×´Ì¬£ºÑÓ³Ù±äÁ¿Î´¿ªÆô
-	) else (
-		echo µ±Ç°ÑÓÊ±±äÁ¿×´Ì¬£ºÑÓ³Ù±äÁ¿ÒÑ¿ªÆô
-	)
-	echo °´ÈÎÒâ¼ü¼ÌÐøÔËÐÐ --------------------¡·
-	pause 1>nul
-) 
+    echo å½“å‰æŒ‡ä»¤ï¼š
+    echo %cmdcmdline% 
+    echo.
+    echo å½“å‰å‚æ•°ï¼š
+    echo å‚æ•° 0ï¼š%0 å‚æ•° 1ï¼š%1  å‚æ•° 2ï¼š%2  å‚æ•° 3ï¼š%3  å‚æ•° 4ï¼š%4
+    echo å‚æ•° 5ï¼š%5 å‚æ•° 6ï¼š%6  å‚æ•° 7ï¼š%7  å‚æ•° 8ï¼š%8  å‚æ•° 9ï¼š%9
+    echo.
+    if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+        echo å½“å‰å»¶æ—¶å˜é‡çŠ¶æ€ï¼šå»¶è¿Ÿå˜é‡æœªå¼€å¯
+    ) else (
+        echo å½“å‰å»¶æ—¶å˜é‡çŠ¶æ€ï¼šå»¶è¿Ÿå˜é‡å·²å¼€å¯
+    )
+    echo æŒ‰ä»»æ„é”®ç»§ç»­è¿è¡Œ --------------------ã€‹
+    pause 1>nul
+)
+@rem ==============================================================
+@rem æ ¹æ®ç¬¬ä¸€ä¸ªå‚æ•°åˆ¤æ–­è„šæœ¬çš„å¯åŠ¨æ–¹å¼ï¼ˆè°ƒç”¨æ–¹æ³•æˆ–å¯åŠ¨è„šæœ¬ï¼‰ã€‚
+@rem %~1 ä¸º voidã€intã€booleanã€stringã€vo æ—¶è®¤ä¸ºæ˜¯è°ƒç”¨æ–¹æ³•ï¼Œå¦åˆ™æ˜¯å¯åŠ¨è„šæœ¬ã€‚
+if "%~1"=="void" goto methodBrach
+if "%~1"=="int" goto methodBrach
+if "%~1"=="boolean" goto methodBrach
+if "%~1"=="string" goto methodBrach
+if "%~1"=="vo" goto methodBrach
+goto beforeMain
+
 :methodBrach
 	if "%~2"=="initScript" goto initScript
 	if "%~2"=="startMainLoop" goto startMainLoop
@@ -76,43 +77,102 @@ if "%DEBUG%"=="true" (
 	if "%~2"=="unlockScreenDirection" goto unlockScreenDirection
 	if "%~2"=="openSettingActivity" goto openSettingActivity
 	if "%~2"=="faild" goto faild
-	if "!DEBUG!"=="true" echo ·½·¨ "%~2" ²»´æÔÚ
+	if "!DEBUG!"=="true" echo æ–¹æ³• "%~2" ä¸å­˜åœ¨
+goto afterMethodBrach
+
+:afterMethodBrach
+@rem ----------------------------------------------------------------
+    @rem å°è¯•è¿›å…¥æ˜¾å¼è°ƒç”¨çš„ main æ–¹æ³•
+    if "%~2"=="main" goto beforeMain
+    @rem åˆ¤æ–­æ˜¯å¦é»˜è®¤è¿›å…¥ main æ–¹æ³•
+    for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%') do (
+        if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+            @rem è„šæœ¬æ–¹æ³•ä»¥ start æ–¹å¼è°ƒç”¨ï¼ˆç¬¬ä¸€æ¬¡å¯åŠ¨ï¼‰
+            if "%%s"=="/K" (
+                if "%DEFAULT_ENTER_START_MAIN%"=="true" goto beforeMain
+            )
+        )
+        @rem callã€ç›´æŽ¥æˆ–éžç¬¬ä¸€æ¬¡ start æ–¹å¼è°ƒç”¨è„šæœ¬æ–¹æ³•
+        if "%DEFAULT_ENTER_MAIN%"=="true" goto beforeMain
+    )
+    if "%DEBUG%"=="true" echo æ–¹æ³• %~2 ä¸å­˜åœ¨
+@rem ----------------------------------------------------------------
 goto eof
 
+:beforeMain
+@rem ----------------------------------------------------------------
+    if "%FORCE_ENTER_MAIN_WITH_DELAYED_EXPANSION%"=="false" (
+        if "!RUN_ONCE!"=="%RUN_ONCE%" (
+            if "%DEBUG%"=="true" echo å»¶æ—¶å˜é‡å·²å¯ç”¨ï¼Œå·²ç¦æ­¢é‡å¤è¿›å…¥ main æ–¹æ³•
+            goto eof
+        )
+    )
+@rem ----------------------------------------------------------------
+@rem è¿›å…¥ main æ–¹æ³•å‰å¼€ä¸¤å±‚å±€éƒ¨å˜é‡æ‰©å±•ä¿æŠ¤ path å˜é‡ï¼Œç¬¬ä¸€å±‚ç¡®ä¿èƒ½ç”¨ !path!,
+@rem ä½¿ path ä¸å—ç©ºæ ¼å½±å“ï¼Œç¬¬äºŒå±‚ä¿æŠ¤ path å˜é‡ã€‚
+    for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%') do (
+        if "!RUN_ONCE!" neq "%RUN_ONCE%" (
+            @rem å¯¹äºŽç¬¬ä¸€æ¬¡ start æ–¹å¼å’Œç›´æŽ¥å¯åŠ¨è„šæœ¬ï¼Œæ€»æ˜¯æ‰“å¼€å»¶æ—¶å˜é‡
+            if "%%s"=="/K" goto beforeMain_l_1
+            if "%%s"=="/c" goto beforeMain_l_1
+        )
+        @rem å¯¹äºŽç¬¬ä¸€æ¬¡çš„ call å’Œéžç¬¬ä¸€æ¬¡çš„ callã€startã€ç›´æŽ¥åœ°è°ƒç”¨è„šæœ¬ï¼Œæ ¹æ®é…ç½®è®¾ç½®å»¶æ—¶å˜é‡çŠ¶æ€
+        if "%INHERIT_DELAYED_EXPANSION_STATE%"=="true" (
+            @rem ç»§æ‰¿å»¶æ—¶å˜é‡çŠ¶æ€
+            goto beforeMain_l_2
+        ) else (
+            @rem ä¸ç»§æ‰¿å»¶æ—¶å˜é‡çŠ¶æ€ï¼Œå¦‚æžœæ˜¯ç¬¬ä¸€æ¬¡å¯åŠ¨ï¼Œå°±æ‰“å¼€å»¶æ—¶å˜é‡æ‰©å±•ä¿æŠ¤
+            if "!RUN_ONCE!"=="%RUN_ONCE%" (
+                @rem æ ¹æ®é…ç½®å¼ºåˆ¶æ¯æ¬¡éƒ½å¼€å¯å»¶æ—¶å˜é‡æ‹“å±•ä¿æŠ¤
+                if "%FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION%"=="true" goto beforeMain_l_1
+                goto beforeMain_l_2
+            ) else (
+                goto beforeMain_l_1
+            )
+        )
+    )
+    :beforeMain_l_1
+    setlocal enableDelayedExpansion
+    set path=%~dp0;!path!
+    setlocal enableDelayedExpansion
+    :beforeMain_l_2
+@rem ----------------------------------------------------------------
+goto initStaticValue
+
 :initStaticValue
-	@rem µ±Ç°¹¤×÷¸ùÂ·¾¶
+	@rem å½“å‰å·¥ä½œæ ¹è·¯å¾„
 	set tmpdir=%temp%\tmpdir
 	set listtmp=%tmpdir%\list
-	@rem onScriptFirstStart ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onScriptFirstStart ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onScriptFirstStart=null
-	@rem onCoreStart ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onCoreStart ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onCoreStart=null
-	@rem onStartInstallApp ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onStartInstallApp ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onStartInstallApp=null
-	@rem onBeforeInstallingApp ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onBeforeInstallingApp ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onBeforeInstallingApp=null
-	@rem onAfterInstallingApp ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onAfterInstallingApp ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onAfterInstallingApp=null
-	@rem onInstallAppCompleted ÉúÃüÖá³ÐµÄ²å¼þµ÷ÓÃÁ´
+	@rem onInstallAppCompleted ç”Ÿå‘½è½´æ‰¿çš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onInstallAppCompleted=null
-	@rem onStartPushFile ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onStartPushFile ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onStartPushFile=null
-	@rem onBeforePushingFile ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onBeforePushingFile ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onBeforePushingFile=null
-	@rem onAfterPushingFile ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onAfterPushingFile ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onAfterPushingFile=null
-	@rem onPushFileCompleted ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onPushFileCompleted ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onPushFileCompleted=null
-	@rem onCoreLogicFinish ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onCoreLogicFinish ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onCoreLogicFinish=null
-	@rem onCoreFinish ÉúÃüÖÜÆÚµÄ²å¼þµ÷ÓÃÁ´
+	@rem onCoreFinish ç”Ÿå‘½å‘¨æœŸçš„æ’ä»¶è°ƒç”¨é“¾
 	set lifeCycle_onCoreFinish=null
 goto main
 
 :main
-	@rem ³õÊ¼»¯½Å±¾
+	@rem åˆå§‹åŒ–è„šæœ¬
 	call %~n0 void initScript
-	@rem Ö´ÐÐÖ÷Ñ­»·
+	@rem æ‰§è¡Œä¸»å¾ªçŽ¯
 	call %~n0 void startMainLoop
 goto eof
 
@@ -144,32 +204,32 @@ goto eof
 	echo                                                                                      @
 	echo                                                                                      @
 	echo @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-	echo ½Å±¾Æô¶¯ÖÐ¡£¡£¡£
+	echo è„šæœ¬å¯åŠ¨ä¸­ã€‚ã€‚ã€‚
 	choice /d y /t 2 /n 1>nul
 	cd /d %~dp0
 	set path=%~dp0bin;!path!
 	set path=%~dp0opt;!path!
-	@rem ¼ì²âÂ·¾¶ÊÇ·ñ°üº¬¿Õ¸ñ
+	@rem æ£€æµ‹è·¯å¾„æ˜¯å¦åŒ…å«ç©ºæ ¼
 	call %~n0 boolean isPathLegitimate
 	if "!boolean!"=="false" (
-		echo µ±Ç°Â·¾¶ ¡°%~dp0¡± °üº¬¿Õ¸ñ£¬Çë½«´Ë½Å±¾Ó¦ÓÃ·Åµ½ÎÞ¿Õ¸ñµÄÂ·¾¶ÖÐÔÙÔËÐÐ...
+		echo å½“å‰è·¯å¾„ â€œ%~dp0â€ åŒ…å«ç©ºæ ¼ï¼Œè¯·å°†æ­¤è„šæœ¬åº”ç”¨æ”¾åˆ°æ— ç©ºæ ¼çš„è·¯å¾„ä¸­å†è¿è¡Œ...
 		echo.
 		echo.
 		echo.
 		echo.
 		echo.
 		echo.
-		echo °´ÈÎÒâ¼üÍË³ö
+		echo æŒ‰ä»»æ„é”®é€€å‡º
 		pause 1>nul
 		goto eof
 	)
-	@rem ÅÐ¶Ïµ±Ç°Õ¼ÓÃ 5037 ¶Ë¿ÚµÄ½ø³Ì
-	echo ¼ì²é 5037 ¶Ë¿Ú¡£¡£¡£
+	@rem åˆ¤æ–­å½“å‰å ç”¨ 5037 ç«¯å£çš„è¿›ç¨‹
+	echo æ£€æŸ¥ 5037 ç«¯å£ã€‚ã€‚ã€‚
 	call %~n0 boolean is5037Occupied
 	if "!boolean!"=="true" (
 		call %~n0 string get5037ProcessName
 		if "!string!"=="adb.exe" (
-			@rem adb ½ø³ÌÕýÔÚÕ¼ÓÃ 5037 ¶Ë¿Ú,³¢ÊÔ 3 ´ÎÊ¹ÓÃµ±Ç°½Å±¾µÄ adb ³ÌÐò
+			@rem adb è¿›ç¨‹æ­£åœ¨å ç”¨ 5037 ç«¯å£,å°è¯• 3 æ¬¡ä½¿ç”¨å½“å‰è„šæœ¬çš„ adb ç¨‹åº
 			call %~n0 boolean restartAdb
 			if "!boolean!"=="false" call %~n0 boolean restartAdb
 			if "!boolean!"=="false" call %~n0 boolean restartAdb
@@ -178,7 +238,7 @@ goto eof
 				goto eof
 			)
 		) else (
-			@rem ·Ç adb ½ø³ÌÔÚÕ¼ÓÃ 5037 ¶Ë¿Ú£¬ÏÈ³¢ÊÔ 3 ´Ë¹Ø±ÕÕ¼ÓÃ 5037 ¶Ë¿ÚµÄ½ø³Ì£¬Èç¹ûÊ§°ÜÔò½¨ÒéÊÖ¶¯¹Ø±ÕÏàÓ¦½ø³Ì
+			@rem éž adb è¿›ç¨‹åœ¨å ç”¨ 5037 ç«¯å£ï¼Œå…ˆå°è¯• 3 æ­¤å…³é—­å ç”¨ 5037 ç«¯å£çš„è¿›ç¨‹ï¼Œå¦‚æžœå¤±è´¥åˆ™å»ºè®®æ‰‹åŠ¨å…³é—­ç›¸åº”è¿›ç¨‹
 			call %~n0 boolean close5037ProcessByName "!string!"
 			if "!boolean!"=="false" call %~n0 boolean close5037ProcessByName "!string!"
 			if "!boolean!"=="false" call %~n0 boolean close5037ProcessByName "!string!"
@@ -191,27 +251,27 @@ goto eof
 	if exist "%tmpdir%" rd /s /q "%tmpdir%" >nul
 	mkdir %tmpdir%
 	mkdir %listtmp%
-	@rem ³õÊ¼»¯²å¼þÅäÖÃ
+	@rem åˆå§‹åŒ–æ’ä»¶é…ç½®
 	call %~n0 boolean initPluginConfig
 	if "!boolean!"=="false" (
 		call %~n0 void printInitPluginConfigErrPage
 		goto eof
 	)
-	echo ²å¼þ³õÊ¼»¯Íê³É
+	echo æ’ä»¶åˆå§‹åŒ–å®Œæˆ
 	call %~n0 boolean executeLifeCycle "onScriptFirstStart" 
 	if "!boolean!"=="false" (
 		echo.
 		echo ---------------------------------------------------------------------------
 		echo.
-		echo ÔÚ³õÊ¼»¯½Å±¾µÄ¹ý³ÌÖÐ,Ö´ÐÐ onScriptFirstStart ÉúÃüÖÜÆÚÓöµ½´íÎó£¬½Å±¾½«ÔÚ 5 Ãëºó×Ô¶¯½áÊøÔËÐÐ
+		echo åœ¨åˆå§‹åŒ–è„šæœ¬çš„è¿‡ç¨‹ä¸­,æ‰§è¡Œ onScriptFirstStart ç”Ÿå‘½å‘¨æœŸé‡åˆ°é”™è¯¯ï¼Œè„šæœ¬å°†åœ¨ 5 ç§’åŽè‡ªåŠ¨ç»“æŸè¿è¡Œ
 		echo.
 		echo ---------------------------------------------------------------------------
 		choice /d y /t 5 /n 1>nul
 		goto eof
 	)
-	@rem µ±Ç°ÕýÔÚ´¦ÀíµÄÉè±¸µÄ´«ÊäºÅÁÐ±í
+	@rem å½“å‰æ­£åœ¨å¤„ç†çš„è®¾å¤‡çš„ä¼ è¾“å·åˆ—è¡¨
 	set array_processing_transport=null
-	@rem µ±Ç°Á¬½Óµ½µçÄÔµÄÉè±¸´«ÊäºÅÁÐ±í£¨²»¹ÜÉè±¸´¦ÓÚÊ²Ã´×´Ì¬£¬¶¼¼ÇÂ¼Éè±¸´«ÊäºÅ£©
+	@rem å½“å‰è¿žæŽ¥åˆ°ç”µè„‘çš„è®¾å¤‡ä¼ è¾“å·åˆ—è¡¨ï¼ˆä¸ç®¡è®¾å¤‡å¤„äºŽä»€ä¹ˆçŠ¶æ€ï¼Œéƒ½è®°å½•è®¾å¤‡ä¼ è¾“å·ï¼‰
 	set array_devices_transport=null
 goto eof
 
@@ -220,48 +280,48 @@ goto eof
 @rem return void
 :startMainLoop
 	:main_loop_1
-	@rem Ã¿ÃëË¢ÐÂÁ¬½ÓÉè±¸ÁÐ±í
+	@rem æ¯ç§’åˆ·æ–°è¿žæŽ¥è®¾å¤‡åˆ—è¡¨
 	cls
-	echo ----------------------------- µ±Ç°Á¬½Ó×´Ì¬ -----------------------------
-	@rem Ö»¼ÇÂ¼´¦ÓÚ device ×´Ì¬µÄÉè±¸µÄ´«ÊäºÅ
+	echo ----------------------------- å½“å‰è¿žæŽ¥çŠ¶æ€ -----------------------------
+	@rem åªè®°å½•å¤„äºŽ device çŠ¶æ€çš„è®¾å¤‡çš„ä¼ è¾“å·
 	set array_temp_transport=null
 	set array_devices_transport=null
 	set tmp_int_1=0
-	@rem Í³¼ÆÁ¬½ÓµÄÉè±¸ÊýÁ¿
+	@rem ç»Ÿè®¡è¿žæŽ¥çš„è®¾å¤‡æ•°é‡
 	if "!array_processing_transport!" neq "null" (
 		for %%t in (!array_processing_transport!) do set /a tmp_int_1=!tmp_int_1!+1
 	)
-	echo µ±Ç°Õý³£Á¬½ÓÉè±¸ÊýÁ¿£º !tmp_int_1!
-	echo ----------------------------- µ±Ç°Éè±¸ÁÐ±í -----------------------------
+	echo å½“å‰æ­£å¸¸è¿žæŽ¥è®¾å¤‡æ•°é‡ï¼š !tmp_int_1!
+	echo ----------------------------- å½“å‰è®¾å¤‡åˆ—è¡¨ -----------------------------
 	echo ------------------------------------------------------------------------
-	echo	ÐòÁÐºÅ		^|^|	´«ÊäºÅ		^|^|	Éè±¸×´Ì¬
+	echo	åºåˆ—å·		^|^|	ä¼ è¾“å·		^|^|	è®¾å¤‡çŠ¶æ€
 	echo ------------------------------------------------------------------------
 	adb.exe devices -l 1>%tmpdir%\devices
 	for /f "skip=1 tokens=1,2,6" %%i in (%tmpdir%\devices) do (
-		@rem ÁÙÊ±´æÉè±¸×´Ì¬
+		@rem ä¸´æ—¶å­˜è®¾å¤‡çŠ¶æ€
 		set tmp_string_1=null
-		@rem ÁÙÊ±´æ´«ÊäºÅ
+		@rem ä¸´æ—¶å­˜ä¼ è¾“å·
 		set tmp_string_2=null
-		@rem ÁÙÊ±´æÐòÁÐºÅ
+		@rem ä¸´æ—¶å­˜åºåˆ—å·
 		set tmp_string_3=%%~i
-		@rem ÌáÈ¡´«ÊäºÅ 
+		@rem æå–ä¼ è¾“å· 
 		for /f "tokens=2 delims=:" %%x in ("%%~k") do set tmp_string_2=%%~x
-		@rem ÉèÖÃÉè±¸»òÏÔÊ¾Éè±¸×´Ì¬
+		@rem è®¾ç½®è®¾å¤‡æˆ–æ˜¾ç¤ºè®¾å¤‡çŠ¶æ€
 		if not exist "%listtmp%\!tmp_string_2!" (
 			call %~n0 void setDeviceOptStatus !tmp_string_2! %%~j
 		)
 		call %~n0 void getDeviceOptSatus !tmp_string_2! tmp_any_1 tmp_string_1
 		echo	%%~i		!tmp_string_2!			!tmp_string_1!
-		@rem  ÊµÊ±±éÀúÉè±¸ÁÐ±í
+		@rem  å®žæ—¶éåŽ†è®¾å¤‡åˆ—è¡¨
 
 		if "!array_devices_transport!" neq "null" (
 			set array_devices_transport=!array_devices_transport!,"!tmp_string_2!"
 		) else (
 			set array_devices_transport="!tmp_string_2!"
 		)
-		@rem ±êÖ¾Éè±¸ÊÇ·ñÎªÐÂ¼ÓÈëµÄÉè±¸£¬true ±êÊ¶Éè±¸ÊÇÐÂ¼ÓÈëµÄÉè±¸£¬false ÎªÕýÔÚ´¦ÀíÖÐµÄÉè±¸£¬Ä¬ÈÏÎª true
+		@rem æ ‡å¿—è®¾å¤‡æ˜¯å¦ä¸ºæ–°åŠ å…¥çš„è®¾å¤‡ï¼Œtrue æ ‡è¯†è®¾å¤‡æ˜¯æ–°åŠ å…¥çš„è®¾å¤‡ï¼Œfalse ä¸ºæ­£åœ¨å¤„ç†ä¸­çš„è®¾å¤‡ï¼Œé»˜è®¤ä¸º true
 		set isNew=true
-		@rem ¿ªÊ¼ÅÐ¶ÏÉè±¸ÊÇ·ñÊÇÐÂÁ¬½ÓµÄÉè±¸
+		@rem å¼€å§‹åˆ¤æ–­è®¾å¤‡æ˜¯å¦æ˜¯æ–°è¿žæŽ¥çš„è®¾å¤‡
 		if "%%~j"=="device" (
 			if "!array_temp_transport!" neq "null" (
 				set array_temp_transport=!array_temp_transport!,"!tmp_string_2!"
@@ -279,7 +339,7 @@ goto eof
 		)
 	)
 	set array_processing_transport=!array_temp_transport!
-	@rem É¾³ý²»±ØÒªµÄ×´Ì¬ÁÙÊ±ÎÄ¼þ
+	@rem åˆ é™¤ä¸å¿…è¦çš„çŠ¶æ€ä¸´æ—¶æ–‡ä»¶
 	for %%i in (%listtmp%\*) do (
 		set tmp_boolean_1=false
 		for %%o in (!array_devices_transport!) do (
@@ -287,7 +347,7 @@ goto eof
 		)
 		if "!tmp_boolean_1!"=="false" del /f /q "%listtmp%\%%~ni"
 	)
-	@rem µÈ´ýÒ»Ãë
+	@rem ç­‰å¾…ä¸€ç§’
 	choice /d y /t 1 /n 1>nul
 	goto main_loop_1
 goto eof
@@ -298,11 +358,11 @@ goto eof
 :printNostartAdbPage_1
 	cls
 	echo ==================================================================================
-	echo Æô¶¯½Å±¾Ê±ÎÞ·¨Æô¶¯ adb ³ÌÐò·þÎñ£¬Ô­ÒòÎª adb ³ÌÐòµÄ 5037 ¶Ë¿ÚÕý±»ÁíÒ»¸ö adb ³ÌÐò
-	echo Õ¼ÓÃÇÒÎÞ·¨½«Æä¹Ø±Õ£¬ÇëÔÚÈÎÎñ¹ÜÀíÆ÷ÀïÊÖ¶¯¹Ø±ÕÕ¼ÓÃ 5037 ¶Ë¿ÚµÄ adb ³ÌÐò
+	echo å¯åŠ¨è„šæœ¬æ—¶æ— æ³•å¯åŠ¨ adb ç¨‹åºæœåŠ¡ï¼ŒåŽŸå› ä¸º adb ç¨‹åºçš„ 5037 ç«¯å£æ­£è¢«å¦ä¸€ä¸ª adb ç¨‹åº
+	echo å ç”¨ä¸”æ— æ³•å°†å…¶å…³é—­ï¼Œè¯·åœ¨ä»»åŠ¡ç®¡ç†å™¨é‡Œæ‰‹åŠ¨å…³é—­å ç”¨ 5037 ç«¯å£çš„ adb ç¨‹åº
 	echo 1>nul
 	echo 1>nul
-	echo °´ÈÎÒâ¼üÍË³ö½Å±¾
+	echo æŒ‰ä»»æ„é”®é€€å‡ºè„šæœ¬
 	echo 1>nul
 	echo 1>nul
 	echo ==================================================================================
@@ -316,14 +376,14 @@ goto eof
 :printNostartAdbPage_2
 	cls
 	echo ==================================================================================
-	echo Æô¶¯½Å±¾Ê±ÎÞ·¨Æô¶¯ adb ³ÌÐò·þÎñ£¬Ô­ÒòÎª adb ³ÌÐòµÄ 5037 ¶Ë¿ÚÕý±» ¡°%~n3¡± ½ø³ÌÕ¼ÓÃÇÒ
-	echo ½Å±¾³¢ÊÔ 3 ´Î¹Ø±Õ¸Ã½ø³Ì¶¼Î´³É¹¦£¬ÇëÊÖ¶¯¹Ø±Õ¸Ã½ø³ÌºóÔÙÆô¶¯½Å±¾¡£
+	echo å¯åŠ¨è„šæœ¬æ—¶æ— æ³•å¯åŠ¨ adb ç¨‹åºæœåŠ¡ï¼ŒåŽŸå› ä¸º adb ç¨‹åºçš„ 5037 ç«¯å£æ­£è¢« â€œ%~n3â€ è¿›ç¨‹å ç”¨ä¸”
+	echo è„šæœ¬å°è¯• 3 æ¬¡å…³é—­è¯¥è¿›ç¨‹éƒ½æœªæˆåŠŸï¼Œè¯·æ‰‹åŠ¨å…³é—­è¯¥è¿›ç¨‹åŽå†å¯åŠ¨è„šæœ¬ã€‚
 	echo 1>nul
-	echo ×¢£º¸ÃÀà½ø³ÌÒ»°ãÎª ¡°XXÊÖ»ú¹Ü¼Ò¡±¡¢¡°XXÊÖ»úÖúÊÖ¡±¡¢¡°XXÊÖ»úÇåÀí´óÊ¦¡±µÈÁ÷Ã¥Èí¼þ£¬¿ÉÒÔÖ±½Ó
-	echo 	ËüÃÇµÄ²Ëµ¥ÖÐ½«ËûÃÇ¹Ø±Õ¡£
+	echo æ³¨ï¼šè¯¥ç±»è¿›ç¨‹ä¸€èˆ¬ä¸º â€œXXæ‰‹æœºç®¡å®¶â€ã€â€œXXæ‰‹æœºåŠ©æ‰‹â€ã€â€œXXæ‰‹æœºæ¸…ç†å¤§å¸ˆâ€ç­‰æµæ°“è½¯ä»¶ï¼Œå¯ä»¥ç›´æŽ¥
+	echo 	å®ƒä»¬çš„èœå•ä¸­å°†ä»–ä»¬å…³é—­ã€‚
 	echo 1>nul
 	echo 1>nul
-	echo °´ÈÎÒâ¼üÍË³ö½Å±¾
+	echo æŒ‰ä»»æ„é”®é€€å‡ºè„šæœ¬
 	echo 1>nul
 	echo 1>nul
 	echo ==================================================================================
@@ -336,11 +396,11 @@ goto eof
 :printInitPluginConfigErrPage
 	cls
 	echo ==================================================================================
-	echo ½Å±¾ÔÚ¸ù¾Ý .\opt Ä¿Â¼ÏÂµÄ plugin_config.txt ÅäÖÃÎÄ¼þ³õÊ¼»¯²å¼þÅäÖÃÊ±Óöµ½´íÎó£¬Çë¸ù¾Ý
-	echo ÅäÖÃÎÄ¼þÀïµÄËµÃ÷¼ì²éÅäÖÃ¡£
+	echo è„šæœ¬åœ¨æ ¹æ® .\opt ç›®å½•ä¸‹çš„ plugin_config.txt é…ç½®æ–‡ä»¶åˆå§‹åŒ–æ’ä»¶é…ç½®æ—¶é‡åˆ°é”™è¯¯ï¼Œè¯·æ ¹æ®
+	echo é…ç½®æ–‡ä»¶é‡Œçš„è¯´æ˜Žæ£€æŸ¥é…ç½®ã€‚
 	echo 1>nul
 	echo 1>nul
-	echo °´ÈÎÒâ¼üÍË³ö½Å±¾
+	echo æŒ‰ä»»æ„é”®é€€å‡ºè„šæœ¬
 	echo 1>nul
 	echo 1>nul
 	echo ==================================================================================
@@ -392,9 +452,9 @@ goto eof
 @rem return boolean If restart adb.exe success that will return true,otherwise return false
 :restartAdb
 	set result=true
-	@rem Ç¿ÐÐ¹Ø±Õ¶àÓàµÄ adb 
+	@rem å¼ºè¡Œå…³é—­å¤šä½™çš„ adb 
 	taskkill /f /im adb.exe 1>nul 2>nul
-	@rem ÖØÐÂ¿ªÆô adb ·þÎñ
+	@rem é‡æ–°å¼€å¯ adb æœåŠ¡
 	adb.exe start-server 1>nul 2>nul
 	if %errorlevel% geq 1 (
 		set result=false
@@ -418,22 +478,22 @@ goto eof
 @rem return boolean If initialize config success that return true,otherwise return false
 :initPluginConfig
 	set result=true
-	@rem ÅÐ¶ÏÅäÖÃÎÄ¼þÊÇ·ñ´æÔÚ£¬²»´æÔÚÔòÐÂ½¨Ò»¸ö,ÐÂµÄÅäÖÃÎÄ¼þÃ»ÓÐÊ¹ÓÃËµÃ÷
+	@rem åˆ¤æ–­é…ç½®æ–‡ä»¶æ˜¯å¦å­˜åœ¨ï¼Œä¸å­˜åœ¨åˆ™æ–°å»ºä¸€ä¸ª,æ–°çš„é…ç½®æ–‡ä»¶æ²¡æœ‰ä½¿ç”¨è¯´æ˜Ž
 	if not exist ".\opt\plugin_config.txt" call %~n0 void createNewPluginConfigFile
-	echo ¶ÁÈ¡²å¼þÅäÖÃÎÄ¼þ .\opt\plugin_config.txt ÖÐ¡£¡£¡£
-	@rem ´ÓÅäÖÃÎÄ¼þ¶ÁÈ¡µ½µÄÄÚÈÝ
+	echo è¯»å–æ’ä»¶é…ç½®æ–‡ä»¶ .\opt\plugin_config.txt ä¸­ã€‚ã€‚ã€‚
+	@rem ä»Žé…ç½®æ–‡ä»¶è¯»å–åˆ°çš„å†…å®¹
 	set tmp_string_1=null
-	@rem ÉúÃüÖÜÆÚ
+	@rem ç”Ÿå‘½å‘¨æœŸ
 	set tmp_string_2=null
 	for /f "eol=#" %%t in (.\opt\plugin_config.txt) do (
-		@rem ´ÓÅäÖÃÎÄ¼þ¶ÁÈ¡µ½µÄÄÚÈÝ
+		@rem ä»Žé…ç½®æ–‡ä»¶è¯»å–åˆ°çš„å†…å®¹
 		set tmp_string_1=%%~t
 		set tmp_string_3=!tmp_string_1:~0,1!
 		if "!tmp_string_3!"==":" (
-			@rem ½âÎöµ½ÉúÃüÖÜÆÚ
+			@rem è§£æžåˆ°ç”Ÿå‘½å‘¨æœŸ
 			set result=false
 			set tmp_string_2=!tmp_string_1:~1!
-			echo ½âÎöµ½ÉúÃüÖÜÆÚ !tmp_string_2!
+			echo è§£æžåˆ°ç”Ÿå‘½å‘¨æœŸ !tmp_string_2!
 			if "!tmp_string_2!"=="onScriptFirstStart" set result=true
 			if "!tmp_string_2!"=="onCoreStart" set result=true
 			if "!tmp_string_2!"=="onStartInstallApp" set result=true
@@ -447,13 +507,13 @@ goto eof
 			if "!tmp_string_2!"=="onCoreLogicFinish" set result=true
 			if "!tmp_string_2!"=="onCoreFinish" set result=true
 			if "!result!"=="false" (
-				echo ´íÎóµÄÉúÃüÖÜÆÚ !tmp_string_2! £¬½Å±¾½«Í£Ö¹½âÎö²å¼þÅäÖÃÎÄ¼þ²¢ÍË³ö
+				echo é”™è¯¯çš„ç”Ÿå‘½å‘¨æœŸ !tmp_string_2! ï¼Œè„šæœ¬å°†åœæ­¢è§£æžæ’ä»¶é…ç½®æ–‡ä»¶å¹¶é€€å‡º
 				pause 1>nul
 				goto initPluginConfig_b_1
 			)
 		) else (
 			if "!tmp_string_1!" neq "" (
-				@rem ½âÎöµ½²å¼þÃû
+				@rem è§£æžåˆ°æ’ä»¶å
 				if "!tmp_string_2!" neq "null" (
 					if exist ".\opt\!tmp_string_1!" (
 						call %~n0 void registPlugin "!tmp_string_2!" "!tmp_string_1!"
@@ -492,12 +552,12 @@ goto eof
 							set tmp_boolean_1=true
 						)
 						if "!tmp_boolean_1!"=="false" (
-							echo ÕÒ²»µ½²å¼þÎÄ¼þ !tmp_string_1! ,¸Ã²å¼þ½«²»»á±»×¢²áµ½ ¡°!tmp_string_2!¡± ÉúÃüÖÜÆÚÀï
+							echo æ‰¾ä¸åˆ°æ’ä»¶æ–‡ä»¶ !tmp_string_1! ,è¯¥æ’ä»¶å°†ä¸ä¼šè¢«æ³¨å†Œåˆ° â€œ!tmp_string_2!â€ ç”Ÿå‘½å‘¨æœŸé‡Œ
 						)
 					)
 				) else (
 					set result=false
-					echo ¼ì²âµ½ !tmp_string_1! ²å¼þÎ´ÔÚÉúÃüÖÜÆÚÀï×¢²á£¬½Å±¾½«Í£Ö¹½âÎö²å¼þÅäÖÃÎÄ¼þ²¢ÍË³ö
+					echo æ£€æµ‹åˆ° !tmp_string_1! æ’ä»¶æœªåœ¨ç”Ÿå‘½å‘¨æœŸé‡Œæ³¨å†Œï¼Œè„šæœ¬å°†åœæ­¢è§£æžæ’ä»¶é…ç½®æ–‡ä»¶å¹¶é€€å‡º
 					pause 1>nul
 					goto initPluginConfig_b_1
 				)
@@ -514,7 +574,7 @@ goto eof
 @rem param_3 string Life cycle name
 @rem param_4 string Plugin name
 :registPlugin
-	echo ÔÚÉúÃüÖÜÆÚ ¡°%~n3¡± ×¢²á²å¼þ %~n4
+	echo åœ¨ç”Ÿå‘½å‘¨æœŸ â€œ%~n3â€ æ³¨å†Œæ’ä»¶ %~n4
 	if "!lifeCycle_%~n3!" neq "null" (
 		set lifeCycle_%~n3=!lifeCycle_%~n3!,"%~n4"
 	) else (
@@ -527,7 +587,7 @@ goto eof
 @rem return void
 :createNewPluginConfigFile
 	echo #	This is new config file without document 1>.\opt\plugin_config.txt
-	echo #	format version£º0.0.3 1>.\opt\plugin_config.txt
+	echo #	format versionï¼š0.0.3 1>.\opt\plugin_config.txt
 	echo :onScriptFirstStart 1>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
 	echo.>>.\opt\plugin_config.txt
@@ -589,7 +649,7 @@ goto eof
 	if "!lifeCycle_%~n3!" neq "null" (
 		for %%t in (!lifeCycle_%~n3!) do (
 			if "%~5" neq "" (
-				call %~n0 void setDeviceOptStatus %~5 script_running "Ö´ÐÐ²å¼þ¡®%%~t¡¯ÖÐ"
+				call %~n0 void setDeviceOptStatus %~5 script_running "æ‰§è¡Œæ’ä»¶â€˜%%~tâ€™ä¸­"
 			)
 			call .\opt\%%t boolean opt "%~n3" "%~n4" "%~n5" "%~6"
 			if "%~5" neq "" (
@@ -608,12 +668,12 @@ goto eof
 
 @rem Set device option satus
 @rem The option satus was:
-@rem 	unauthorized	Î´ÑéÖ¤
-@rem	device			ÒÑÁ¬½Ó
-@rem	offline			ÒÑÀëÏß
-@rem	script_running	½Å±¾ÔËÐÐÖÐ
-@rem	complete		Íê³É
-@rem	faild			Ê§°Ü
+@rem 	unauthorized	æœªéªŒè¯
+@rem	device			å·²è¿žæŽ¥
+@rem	offline			å·²ç¦»çº¿
+@rem	script_running	è„šæœ¬è¿è¡Œä¸­
+@rem	complete		å®Œæˆ
+@rem	faild			å¤±è´¥
 @rem When on 'script_running' status,status description
 @rem will replace script_running to show at terminal.
 @rem
@@ -655,31 +715,31 @@ goto eof
 	set result=null
 	if "%~3" neq "" (
 		if "%~3"=="null" ( 
-			set result=ÕýÔÚ»ñÈ¡×´Ì¬¡£¡£¡£
+			set result=æ­£åœ¨èŽ·å–çŠ¶æ€ã€‚ã€‚ã€‚
 			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="unauthorized" ( 
-			set result=Î´ÑéÖ¤
+			set result=æœªéªŒè¯
 			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="device" (
-			set result=ÒÑÁ¬½Ó
+			set result=å·²è¿žæŽ¥
 			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="offline" (
-			set result=ÒÑÀëÏß
+			set result=å·²ç¦»çº¿
 			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="script_running" (
-			set result=½Å±¾ÔËÐÐÖÐ
+			set result=è„šæœ¬è¿è¡Œä¸­
 			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="complete" (
-			set result=Íê³É
+			set result=å®Œæˆ
 			goto getStatusMappedDescription_b_1
 		)
 		if "%~3"=="faild" (
-			set result=Ê§°Ü
+			set result=å¤±è´¥
 			goto getStatusMappedDescription_b_1
 		)
 	)
@@ -693,9 +753,9 @@ goto eof
 @rem param_4 int Transport number
 :coreEntry
 	setlocal enableDelayedExpansion
-	title ÐòÁÐºÅ£º[%~3] ---- ´«ÊäºÅ£º[%~4] ---- script_running
+	title åºåˆ—å·ï¼š[%~3] ---- ä¼ è¾“å·ï¼š[%~4] ---- script_running
 	call %~n0 void setDeviceOptStatus %~4 script_running
-	echo ---------- Éè±¸£º%~4  ----------
+	echo ---------- è®¾å¤‡ï¼š%~4  ----------
 	call %~n0 boolean executeLifeCycle "onCoreStart" "%~n3" "%~n4"
 	echo -------------------------------
 	if "!boolean!"=="true" (
@@ -728,7 +788,7 @@ goto eof
 	echo -------------------------------
 	call %~n0 void openSettingActivity %~4
 	echo -------------------------------
-	title ÐòÁÐºÅ£º[%~3] ---- ´«ÊäºÅ£º[%~4] ---- complete
+	title åºåˆ—å·ï¼š[%~3] ---- ä¼ è¾“å·ï¼š[%~4] ---- complete
 	color 2f
 	call %~n0 void setDeviceOptStatus %~4 complete
 	choice /d y /t 5 /n 1>nul
@@ -749,17 +809,17 @@ goto eof
 		echo -------------------------------
 		set /a tmp_int_3= !tmp_int_3! + 1
 		if "!boolean!"=="true" (
-			echo ÕýÔÚ°²×°µÚ !tmp_int_3! ¸öÓ¦ÓÃ %%~nxt 
-			call %~n0 void setDeviceOptStatus %~4 script_running "°²×°Ó¦ÓÃ£º%%~nxt"
+			echo æ­£åœ¨å®‰è£…ç¬¬ !tmp_int_3! ä¸ªåº”ç”¨ %%~nxt 
+			call %~n0 void setDeviceOptStatus %~4 script_running "å®‰è£…åº”ç”¨ï¼š%%~nxt"
 			adb.exe -t %~4 push ".\app\%%~nxt" "/sdcard/%%~nxt"
 			adb.exe -t %~4 install -t -r ".\app\%%~nxt"
 			call %~n0 void setDeviceOptStatus %~4 script_running
 			echo -------------------------------
 			call %~n0 boolean executeLifeCycle "onAfterInstallingApp" "%~n3" "%~n4" "%~dp0app\%%~nxt"
 			echo -------------------------------
-			echo µÚ !tmp_int_3! ¸öÓ¦ÓÃ %%~nxt °²×°Íê³É
+			echo ç¬¬ !tmp_int_3! ä¸ªåº”ç”¨ %%~nxt å®‰è£…å®Œæˆ
 		) else (
-			echo Ìø¹ýµÚ !tmp_int_3! ¸öÓ¦ÓÃµÄ°²×°
+			echo è·³è¿‡ç¬¬ !tmp_int_3! ä¸ªåº”ç”¨çš„å®‰è£…
 		)
 	)
 	set %~1=!result!
@@ -779,21 +839,21 @@ goto eof
 		echo -------------------------------
 		set /a tmp_int_1= !tmp_int_1! + 1
 		if "!boolean!"=="true" (
-			echo ÕýÔÚÍÆËÍµÚ !tmp_int_1! ¸öÎÄ¼þ£º%%~t
-			call %~n0 void setDeviceOptStatus %~4 script_running "ÍÆËÍÎÄ¼þ£º%%~nxt"
+			echo æ­£åœ¨æŽ¨é€ç¬¬ !tmp_int_1! ä¸ªæ–‡ä»¶ï¼š%%~t
+			call %~n0 void setDeviceOptStatus %~4 script_running "æŽ¨é€æ–‡ä»¶ï¼š%%~nxt"
 			adb.exe -t %~4 push "%%~t" "/sdcard/%%~nxt"
 			call %~n0 void setDeviceOptStatus %~4 script_running
 			if %errorlevel% geq 1 (
-				echo %%~t ÍÆËÍÊ§°Ü
+				echo %%~t æŽ¨é€å¤±è´¥
 				set result=false
 				goto pushFiles_b_1
 			)
 			echo -------------------------------
 			call %~n0 boolean executeLifeCycle "onAfterPushingFile" "%~n3"  "%~n4" "%~dp0files\%%~nxt"
 			echo -------------------------------
-			echo µÚ !tmp_int_1! ¸öÎÄ¼þ£º%%~t ÍÆËÍÍê³É
+			echo ç¬¬ !tmp_int_1! ä¸ªæ–‡ä»¶ï¼š%%~t æŽ¨é€å®Œæˆ
 		) else (
-			echo Ìø¹ýµÚ !tmp_int_1! ¸öÎÄ¼þ ¡°%%~t¡± µÄÍÆËÍ
+			echo è·³è¿‡ç¬¬ !tmp_int_1! ä¸ªæ–‡ä»¶ â€œ%%~tâ€ çš„æŽ¨é€
 		)
 	)
 	:pushFiles_b_1
@@ -834,12 +894,12 @@ goto eof
 @rem param_3 string Device serial number
 @rem param_4 int Device transport number
 :faild
-	title ÐòÁÐºÅ£º[%~3] ---- ´«ÊäºÅ£º[%~4] ---- faild
+	title åºåˆ—å·ï¼š[%~3] ---- ä¼ è¾“å·ï¼š[%~4] ---- faild
 	color 47
 	call %~n0 void setDeviceOptStatus %~4 faild
 	echo -------------------------------
-	echo Éè±¸ %~3  ^(%~4^) ³öÏÖ´íÎó£¬Çë¶Ï¿ªÉè±¸ÓëµçÄÔµÄÁ¬½Ó£¬
-	echo µÈ´ýµ±Ç°´°¿Ú¹Ø±ÕºòÖØÐÂ½«Éè±¸Á¬½Óµ½µçÄÔ¡£
+	echo è®¾å¤‡ %~3  ^(%~4^) å‡ºçŽ°é”™è¯¯ï¼Œè¯·æ–­å¼€è®¾å¤‡ä¸Žç”µè„‘çš„è¿žæŽ¥ï¼Œ
+	echo ç­‰å¾…å½“å‰çª—å£å…³é—­å€™é‡æ–°å°†è®¾å¤‡è¿žæŽ¥åˆ°ç”µè„‘ã€‚
 	choice /d y /t 5 /n 1>nul
 	color 0f
 	goto close
