@@ -14,7 +14,7 @@ chcp 65001 1>nul
 set DEBUG=false
 @rem 配置 call 或命令行调用 main 方法时是否继承父进程的延时变量状态，true 为继承，false 反之，默认为 true
 @rem 注：当值为 false 时，此常量的设置可以被 FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION 常量覆盖
-set INHERIT_DELAYED_EXPANSION_STATE=true
+set INHERIT_DELAYED_EXPANSION_STATE=false
 @rem 配置 call 或命令行调用 脚本方法 时，是否默认进入 mian 方法，true 为默认进入，false 反之，默认为 false
 set DEFAULT_ENTER_MAIN=false
 @rem 配置 start 调用 脚本方法 时，是否默认进入 main 方法，true 为默认进入，false 反之，默认为 false
