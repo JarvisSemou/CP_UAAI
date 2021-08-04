@@ -57,72 +57,72 @@
 4. 数组元素用英文逗号分隔，元素必须用英文双引号括住。  例如：在数组“array_myList”中，里面的元素这样存储：`"item_1","item_2","item_3",...,"item_n"`。当数组没有元素时，值为不加双引号的“`null`”。
 5. 脚本必须打开延迟变量开关（`setlocal enableDelayedExpansion`）。
 6. 统一使用 `UTF-8` 字符集。
-7. 注释格式统一用 “`@rem 注释内容`”
+7. 注释格式统一用 “`@rem 注释内容<空格>`” ，`每行注释内容结尾必须加一个空格！！！！`以防止下一行的中文字符解析出现错误（类似 “XXX 不是内部或外部命令”这样的错误）。`echo` 命令同理。
 8. 方法内部标签格式：
     - `:方法名_b_编号`  用于作为流程中断时跳转的目标
     - `:方法名_l_编号`  用于作为普通流程中的跳转目标
 9. 方法格式：
 
     ```batch
-        @rem 方法描述
-        @rem
-        @rem return 返回类型   对返回的数据的描述
-        @rem param_3 数据类型  参数描述
+        @rem 方法描述  
+        @rem  
+        @rem return 返回类型   对返回的数据的描述  
+        @rem param_3 数据类型  参数描述  
         :方法名
-            @rem 跳转到一个方法内标签
+            @rem 跳转到一个方法内标签  
             gogo :方法名_l_1
             :方法名_l_1
-            echo 已进行跳转
-            @rem 使用 param_3 参数的代码例子
+            echo 已进行跳转  
+            @rem 使用 param_3 参数的代码例子  
             set result=%~3
-            @rem 返回数据的代码例子
+            @rem 返回数据的代码例子  
             set %~1=!result!
-        @rem 方法结束
+        @rem 方法结束  
         goto eof
     ```
 
 10. 脚本格式：
 
     ```batch
-        @echo off
+        @echo off  
         chcp 65001 1>nul
-        @rem ==============================================================
-        @rem 配置调试信息显示，true 为显示调试信息，false 反之，默认为 false
-        set DEBUG=false
-        @rem 配置 call 或命令行调用 main 方法时是否继承父进程的延时变量状态，true 为继承，false 反之，默认为 false
-        @rem 注：当值为 false 时，此常量的设置可以被 FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION 常量覆盖
-        set INHERIT_DELAYED_EXPANSION_STATE=false
-        @rem 配置 call 或命令行调用 脚本方法 时，是否默认进入 mian 方法，true 为默认进入，false 反之，默认为 false
-        set DEFAULT_ENTER_MAIN=false
-        @rem 配置 start 调用 脚本方法 时，是否默认进入 main 方法，true 为默认进入，false 反之，默认为 false
-        set DEFAULT_ENTER_START_MAIN=false
-        @rem 配置在无匹配的方法时，默认运行的方法，填写 null 将不会调用任何方法，默认值为 null
-        set DEFAULT_METHOD=null
-        @rem 配置是否允许在已开启延时变量的情况下主动通过 call 调用 main 方法，true 为允许，false 反之，默认为 false
-        @rem 注：开启后可能会造成死递归
-        set FORCE_ENTER_MAIN_WITH_DELAYED_EXPANSION=false
-        @rem 配置 call 重复进入 main 方法时，是否开启新的延时变量拓展（用来隔离变量），true 为开启，false 反之，默认为 false
-        set FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION=false
-        @rem ==============================================================
+        @rem ==============================================================  
+        @rem 配置调试信息显示，true 为显示调试信息，false 反之，默认为 false  
+        set DEBUG=false  
+        @rem 配置 call 或命令行调用 main 方法时是否继承父进程的延时变量状态，true 为继承，false 反之，默认为 false  
+        @rem 注：当值为 false 时，此常量的设置可以被 FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION 常量覆盖  
+        set INHERIT_DELAYED_EXPANSION_STATE=false  
+        @rem 配置 call 或命令行调用 脚本方法 时，是否默认进入 mian 方法，true 为默认进入，false 反之，默认为 false  
+        set DEFAULT_ENTER_MAIN=false  
+        @rem 配置 start 调用 脚本方法 时，是否默认进入 main 方法，true 为默认进入，false 反之，默认为 false  
+        set DEFAULT_ENTER_START_MAIN=false  
+        @rem 配置在无匹配的方法时，默认运行的方法，填写 null 将不会调用任何方法，默认值为 null  
+        set DEFAULT_METHOD=null  
+        @rem 配置是否允许在已开启延时变量的情况下主动通过 call 调用 main 方法，true 为允许，false 反之，默认为 false  
+        @rem 注：开启后可能会造成死递归  
+        set FORCE_ENTER_MAIN_WITH_DELAYED_EXPANSION=false  
+        @rem 配置 call 重复进入 main 方法时，是否开启新的延时变量拓展（用来隔离变量），true 为开启，false 反之，默认为 false  
+        set FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION=false  
+        @rem ==============================================================  
         if "%DEBUG%"=="true" (
-            echo 当前指令：
-            echo %cmdcmdline% 
-            echo.
-            echo 当前参数：
-            echo 参数 0：%0 参数 1：%1  参数 2：%2  参数 3：%3  参数 4：%4
-            echo 参数 5：%5 参数 6：%6  参数 7：%7  参数 8：%8  参数 9：%9
-            echo.
+            echo 当前指令：  
+            echo %cmdcmdline%  
+            echo.  
+            echo 当前参数：  
+            echo 参数 0：%0 参数 1：%1  参数 2：%2  参数 3：%3  参数 4：%4  
+            echo 参数 5：%5 参数 6：%6  参数 7：%7  参数 8：%8  参数 9：%9  
+            echo.  
             if "!RUN_ONCE!" neq "%RUN_ONCE%" (
-                echo 当前延时变量状态：延迟变量未开启
+                echo 当前延时变量状态：延迟变量未开启  
             ) else (
-                echo 当前延时变量状态：延迟变量已开启
+                echo 当前延时变量状态：延迟变量已开启  
             )
-            echo 按任意键继续运行 --------------------》
+            echo 按任意键继续运行 --------------------》  
             pause 1>nul
         )
-        @rem ==============================================================
-        @rem 根据第一个参数判断脚本的启动方式（调用方法或启动脚本）。
-        @rem %~1 为 void、int、boolean、string、vo 时认为是调用方法，否则是启动脚本。
+        @rem ==============================================================  
+        @rem 根据第一个参数判断脚本的启动方式（调用方法或启动脚本）。  
+        @rem %~1 为 void、int、boolean、string、vo 时认为是调用方法，否则是启动脚本。  
         if "%~1"=="void" goto methodBrach
         if "%~1"=="int" goto methodBrach
         if "%~1"=="boolean" goto methodBrach
@@ -130,59 +130,59 @@
         if "%~1"=="vo" goto methodBrach
         goto beforeMain
 
-        @rem 在这里判断方法名并跳转到相应的方法流程分支
+        @rem 在这里判断方法名并跳转到相应的方法流程分支  
         :methodBrach
-            @rem if "%~2"=="close" goto close
+            @rem if "%~2"=="close" goto close  
 
         goto afterMethodBrach
 
-        @rem 控制默认进入 main 方法
-        :afterMethodBrach
-        @rem ----------------------------------------------------------------
-            @rem 尝试进入显式调用的 main 方法
+        @rem 控制默认进入 main 方法  
+        :afterMethodBrach  
+        @rem ----------------------------------------------------------------  
+            @rem 尝试进入显式调用的 main 方法  
             if "%~2"=="main" goto beforeMain
-            @rem 判断是否默认进入 main 方法
-            for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%') do (
+            @rem 判断是否默认进入 main 方法  
+            for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%  ') do (
                 if "!RUN_ONCE!" neq "%RUN_ONCE%" (
-                    @rem 脚本方法以 start 方式调用（第一次启动）
+                    @rem 脚本方法以 start 方式调用（第一次启动）  
                     if "%%s"=="/K" (
                         if "%DEFAULT_ENTER_START_MAIN%"=="true" goto beforeMain
                     )
                 )
-                @rem call、直接或非第一次 start 方式调用脚本方法
+                @rem call、直接或非第一次 start 方式调用脚本方法  
                 if "%DEFAULT_ENTER_MAIN%"=="true" goto beforeMain
             )
             if "%DEFAULT_METHOD%" neq "null" goto %DEFAULT_METHOD%
-            if "%DEBUG%"=="true" echo 方法 %~2 不存在
-        @rem ----------------------------------------------------------------
+            if "%DEBUG%"=="true" echo 方法 %~2 不存在  
+        @rem ----------------------------------------------------------------  
         goto eof
         
-        @rem 控制是否可以进入 main 方法
+        @rem 控制是否可以进入 main 方法  
         :beforeMain
-        @rem ----------------------------------------------------------------
+        @rem ----------------------------------------------------------------  
             if "%FORCE_ENTER_MAIN_WITH_DELAYED_EXPANSION%"=="false" (
                 if "!RUN_ONCE!"=="%RUN_ONCE%" (
-                    if "%DEBUG%"=="true" echo 延时变量已启用，已禁止重复进入 main 方法
+                    if "%DEBUG%"=="true" echo 延时变量已启用，已禁止重复进入 main 方法  
                     goto eof
                 )
             )
-        @rem ----------------------------------------------------------------
-        @rem 进入 main 方法前开两层局部变量扩展保护 path 变量，第一层确保能用 !path!,
-        @rem 使 path 不受空格影响，第二层保护 path 变量。
-            for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%') do (
+        @rem ----------------------------------------------------------------  
+        @rem 进入 main 方法前开两层局部变量扩展保护 path 变量，第一层确保能用 !path!,  
+        @rem 使 path 不受空格影响，第二层保护 path 变量。  
+            for /f "tokens=1,2" %%r in ('echo %CMDCMDLINE%  ') do (
                 if "!RUN_ONCE!" neq "%RUN_ONCE%" (
-                    @rem 对于第一次 start 方式和直接启动脚本，总是打开延时变量
+                    @rem 对于第一次 start 方式和直接启动脚本，总是打开延时变量  
                     if "%%s"=="/K" goto beforeMain_l_1
                     if "%%s"=="/c" goto beforeMain_l_1
                 )
-                @rem 对于第一次的 call 和非第一次的 call、start、直接地调用脚本，根据配置设置延时变量状态
+                @rem 对于第一次的 call 和非第一次的 call、start、直接地调用脚本，根据配置设置延时变量状态  
                 if "%INHERIT_DELAYED_EXPANSION_STATE%"=="true" (
-                    @rem 继承延时变量状态
+                    @rem 继承延时变量状态  
                     goto beforeMain_l_2
                 ) else (
-                    @rem 不继承延时变量状态，如果是第一次启动，就打开延时变量扩展保护
+                    @rem 不继承延时变量状态，如果是第一次启动，就打开延时变量扩展保护  
                     if "!RUN_ONCE!"=="%RUN_ONCE%" (
-                        @rem 根据配置强制每次都开启延时变量拓展保护
+                        @rem 根据配置强制每次都开启延时变量拓展保护  
                         if "%FORCE_ENTER_MAIN_WITH_NEW_DELAYED_EXPANSION%"=="true" goto beforeMain_l_1
                         goto beforeMain_l_2
                     ) else (
@@ -195,23 +195,23 @@
             set path=%~dp0;!path!
             setlocal enableDelayedExpansion
             :beforeMain_l_2
-        @rem ----------------------------------------------------------------
+        @rem ----------------------------------------------------------------  
         goto initStaticValue
 
         :initStaticValue
-            @rem 在这里初始化静态变量
+            @rem 在这里初始化静态变量  
         goto main
 
-        @rem 主方法（脚本入口）
+        @rem 主方法（脚本入口）  
         :main
-            @rem 填写主逻辑
-            @rem 调用方法的格式（参数要加双引号）
-            @rem 格式：call %~n0 返回值 方法名 "参数1" "参数2" ... "参数n"
-            @rem 例子（假设存在返回值为 void 的 print 方法）：
-            @rem call %~n0 void print "Hello World"
+            @rem 填写主逻辑  
+            @rem 调用方法的格式（参数要加双引号）  
+            @rem 格式：call %~n0 返回值 方法名 "参数1" "参数2" ... "参数n"  
+            @rem 例子（假设存在返回值为 void 的 print 方法）：  
+            @rem call %~n0 void print "Hello World"  
         goto eof
 
-        @rem 脚本出口
+        @rem 脚本出口  
         :eof
     ```
 
